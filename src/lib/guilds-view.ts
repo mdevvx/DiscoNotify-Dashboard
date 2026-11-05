@@ -1,7 +1,7 @@
 import "server-only";
 import { getGuildPlans, type GuildPlanRow } from "./db";
 import { guildIconUrl } from "./discord";
-import type { SessionData, SessionGuild } from "./session";
+import type { SessionGuild } from "./session";
 
 export interface GuildView {
   id: string;
@@ -12,16 +12,15 @@ export interface GuildView {
   plan: GuildPlanRow | null;
 }
 
-export type PlanLabel = "Free" | "Paid" | "Whitelisted";
+export type PlanLabel = "Free" | "Premium" | "Whitelisted";
 
 export function planLabel(plan: GuildPlanRow | null): PlanLabel {
   if (plan?.plan === "whitelisted") return "Whitelisted";
-  return plan?.unlimited ? "Paid" : "Free";
+  return plan?.unlimited ? "Premium" : "Free";
 }
 
-/** Session names may be trimmed to fit the cookie: fall back to the database name, then a placeholder. */
-export async function buildGuildViews(session: SessionData): Promise<GuildView[]> {
-  const list: SessionGuild[] = session.guilds ?? [];
+/** Names and icons come from Discord; fall back to the database name, then a placeholder. */
+export async function buildGuildViews(list: SessionGuild[]): Promise<GuildView[]> {
   const plans = await getGuildPlans(list.map((g) => g.id));
   return list
     .map<GuildView>((g) => {

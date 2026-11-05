@@ -42,7 +42,7 @@ export function StatusChip(props: Pick<AccountView, "enabled" | "status" | "paus
   const s = statusOf(props);
   const Icon = s.icon;
   return (
-    <Badge tone={s.tone} icon={<Icon className="h-3 w-3" aria-hidden="true" />}>
+    <Badge tone={s.tone} icon={<Icon className="size-3" aria-hidden="true" />}>
       {s.label}
     </Badge>
   );
@@ -122,7 +122,7 @@ export function AccountsView({
           ))}
         </div>
         <Button variant="primary" onClick={() => setAdding(true)}>
-          <Plus className="h-4 w-4" aria-hidden="true" /> Add account
+          <Plus className="size-4" aria-hidden="true" /> Add account
         </Button>
       </div>
 
@@ -145,7 +145,7 @@ export function AccountsView({
                   <div className="min-w-0 space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <PlatformBadge platform={a.platform} />
-                      {a.live && <Badge tone="danger" icon={<Radio className="h-3 w-3" aria-hidden="true" />}>Live now</Badge>}
+                      {a.live && <Badge tone="danger" icon={<Radio className="size-3" aria-hidden="true" />}>Live now</Badge>}
                       <StatusChip enabled={a.enabled} status={a.status} pausedByPlan={a.pausedByPlan} />
                     </div>
                     <div className="flex min-w-0 items-center gap-1.5">
@@ -154,7 +154,7 @@ export function AccountsView({
                       </Link>
                       {url && (
                         <a href={url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${a.username} on ${PLATFORM_META[a.platform]?.name}`} className="text-text-muted hover:text-text">
-                          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                          <ExternalLink className="size-3.5" aria-hidden="true" />
                         </a>
                       )}
                     </div>

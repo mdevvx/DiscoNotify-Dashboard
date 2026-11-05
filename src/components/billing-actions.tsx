@@ -154,7 +154,7 @@ function CryptoDialog({ guildId, open, onOpenChange, price }: { guildId: string;
           </div>
         </div>
       ) : status === "paid" ? (
-        <p role="status" className="text-success">✅ Payment received. Your server now has {pay.months} more months of Paid.</p>
+        <p role="status" className="text-success">✅ Payment received. Your server now has {pay.months} more months of Premium.</p>
       ) : status === "failed" || status === "expired" ? (
         <p role="alert" className="text-danger">This payment {status === "expired" ? "expired" : "failed"}. Nothing was credited — start a new one.</p>
       ) : (
@@ -164,9 +164,9 @@ function CryptoDialog({ guildId, open, onOpenChange, price }: { guildId: string;
             {pay.address}<CopyButton value={pay.address} label="Copy address" />
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {qr && <img src={qr} alt="QR code of the payment address" width={160} height={160} className="rounded bg-white" />}
+          {qr && <img src={qr} alt="QR code of the payment address" width={160} height={160} className="rounded-sm bg-white" />}
           <p aria-live="polite" className="flex items-center gap-2 text-text-muted">
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Waiting for the payment…
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Waiting for the payment…
             {left !== null && <span className="tabular-nums">{Math.floor(left / 60)}:{String(left % 60).padStart(2, "0")} left</span>}
           </p>
         </div>
@@ -175,7 +175,7 @@ function CryptoDialog({ guildId, open, onOpenChange, price }: { guildId: string;
   );
 }
 
-/** After a card payment: polls the plan until the bot flips the server to Paid. */
+/** After a card payment: polls the plan until the bot flips the server to Premium. */
 export function PlanFlip({ guildId }: { guildId: string }) {
   const router = useRouter();
   const [state, setState] = useState<"waiting" | "paid" | "slow">("waiting");
@@ -197,8 +197,8 @@ export function PlanFlip({ guildId }: { guildId: string }) {
   }, [guildId, router]);
   return (
     <p aria-live="polite" className="mt-3 flex items-center gap-2 text-sm">
-      {state === "waiting" && <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Activating your server…</>}
-      {state === "paid" && <span className="text-success">✅ Paid — unlimited accounts</span>}
+      {state === "waiting" && <><Loader2 className="size-4 animate-spin" aria-hidden="true" /> Activating your server…</>}
+      {state === "paid" && <span className="text-success">✅ Premium — unlimited accounts</span>}
       {state === "slow" && "Your payment is confirmed; activation is taking longer than usual — it will switch on automatically. Contact support if not."}
     </p>
   );

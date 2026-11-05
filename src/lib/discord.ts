@@ -2,7 +2,7 @@ import "server-only";
 import type { IronSession } from "iron-session";
 import { getEnv } from "./env";
 import { canManageGuild } from "./permissions";
-import { fitGuilds, type SessionData, type SessionGuild } from "./session";
+import type { SessionData, SessionGuild } from "./session";
 
 const API = "https://discord.com/api";
 
@@ -114,7 +114,7 @@ export async function fetchManageableGuilds(token: string): Promise<SessionGuild
   const list = raw
     .filter((g) => canManageGuild(Boolean(g.owner), g.permissions))
     .map<SessionGuild>((g) => ({ id: g.id, n: g.name, i: g.icon, o: Boolean(g.owner), p: String(g.permissions) }));
-  return fitGuilds(list);
+  return list;
 }
 
 export function applyTokens(session: SessionData, t: DiscordTokens): void {
@@ -124,27 +124,16 @@ export function applyTokens(session: SessionData, t: DiscordTokens): void {
 }
 
 /**
- * Re-reads the manageable server list from Discord (refreshing the token when needed) and saves it.
- * Returns false when the person must log in again.
+ * Makes sure the access token is usable (refreshes it with the refresh token when it is about to expire) and saves the cookie.
+ * Only call from route handlers (cookies cannot be written while rendering). Returns false when the person must log in again.
  */
-export async function refreshGuildList(session: IronSession<SessionData>): Promise<boolean> {
+export async function refreshSessionTokens(session: IronSession<SessionData>, { force = false }: { force?: boolean } = {}): Promise<boolean> {
   try {
-    if (!session.at || !session.rt) return false;
-    if (!session.exp || session.exp < Date.now() + 60_000) {
+    if (!session.rt) return false;
+    if (force || !session.at || !session.exp || session.exp < Date.now() + 60_000) {
       applyTokens(session, await refreshTokens(session.rt));
+      await session.save();
     }
-    let guilds: SessionGuild[];
-    try {
-      guilds = await fetchManageableGuilds(session.at!);
-    } catch (e) {
-      if (e instanceof DiscordError && e.status === 401) {
-        applyTokens(session, await refreshTokens(session.rt!));
-        guilds = await fetchManageableGuilds(session.at!);
-      } else throw e;
-    }
-    session.guilds = guilds;
-    session.guildsFetchedAt = Date.now();
-    await session.save();
     return true;
   } catch {
     return false;

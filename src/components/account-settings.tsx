@@ -94,7 +94,7 @@ export function AccountSettings({
               {configs.map((c) => <option key={c.event_type} value={c.event_type}>{EVENT_LABELS[c.event_type] ?? c.event_type}</option>)}
             </Select>
             <Button loading={busy === "test"} onClick={() => run("test", () => api(`${base}/test`, "POST", { event_type: testType || undefined }), "Test alert sent — nobody was pinged.")}>
-              <Send className="h-4 w-4" aria-hidden="true" /> Send test alert
+              <Send className="size-4" aria-hidden="true" /> Send test alert
             </Button>
             <Button loading={busy === "toggle"} onClick={async () => {
               const r = await run("toggle", () => api(base, "PATCH", { enabled: !account.enabled }), account.enabled ? "Paused" : "Resumed");
@@ -234,7 +234,7 @@ function AlertRow({ cfg, platform, data, mentionable, guildId, onToggle }: {
             Show embed / link preview <Switch id={`${id}-embed`} checked={cfg.embed_enabled} onCheckedChange={(v) => onToggle({ embed_enabled: v })} />
           </label>
           <button type="button" aria-expanded={open} aria-controls={`${id}-more`} onClick={() => setOpen((o) => !o)} className="inline-flex min-h-9 items-center gap-1 text-sm text-primary-text">
-            Customize message <ChevronDown className={cn("h-4 w-4 transition-transform duration-150", open && "rotate-180")} aria-hidden="true" />
+            Customize message <ChevronDown className={cn("size-4 transition-transform duration-150", open && "rotate-180")} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -311,7 +311,7 @@ function MentionMessageEditor({ idPrefix, platform, guildId, data, initialRole, 
             ))}
           </Select>
           {data && !can && (
-            <p className="flex items-center gap-1.5 text-xs text-text-muted"><Lock className="h-3 w-3" aria-hidden="true" /> Locked options need the “Mention @everyone, @here and All Roles” permission.</p>
+            <p className="flex items-center gap-1.5 text-xs text-text-muted"><Lock className="size-3" aria-hidden="true" /> Locked options need the “Mention @everyone, @here and All Roles” permission.</p>
           )}
           {role === guildId && <span className="sr-only">Pinging everyone</span>}
         </div>

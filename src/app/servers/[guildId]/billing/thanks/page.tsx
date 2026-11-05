@@ -51,7 +51,7 @@ export default async function ThanksPage({
   const billing = `/servers/${guildId}/billing`;
   const support = getEnv().SUPPORT_EMAIL;
   const view: Record<Outcome, { icon: string; title: string; body: string; again: boolean }> = {
-    succeeded: { icon: "✅", title: "Payment received", body: "Switching your server to Paid — usually under a minute.", again: false },
+    succeeded: { icon: "✅", title: "Payment received", body: "Switching your server to Premium — usually under a minute.", again: false },
     confirmed: { icon: "⚠️", title: "Your payment is being processed", body: "Don’t pay again — check back in a few minutes.", again: false },
     open: { icon: "⚠️", title: "The payment wasn’t completed", body: "You haven’t been charged.", again: true },
     expired: { icon: "⚠️", title: "This checkout expired", body: "Start a new one when you’re ready.", again: true },

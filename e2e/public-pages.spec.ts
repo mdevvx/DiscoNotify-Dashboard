@@ -8,7 +8,7 @@ const SCHEMES = ["light", "dark"] as const;
 for (const scheme of SCHEMES) {
   for (const width of WIDTHS) {
     test.describe(`login page, ${scheme}, ${width}px`, () => {
-      test.use({ colorScheme: scheme, viewport: { width, height: 800 } });
+      test.use({ colorScheme: scheme, reducedMotion: "reduce", viewport: { width, height: 800 } });
 
       test("renders, has no horizontal scroll, no console errors, passes axe, matches screenshot", async ({ page }) => {
         const problems: string[] = [];
@@ -18,8 +18,8 @@ for (const scheme of SCHEMES) {
         page.on("pageerror", (e) => problems.push(e.message));
 
         await page.goto("/login");
-        await expect(page.getByRole("heading", { name: "Manage DiscoNotify" })).toBeVisible();
-        await expect(page.getByRole("link", { name: "Log in with Discord" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: /Never miss a drop/ })).toBeVisible();
+        await expect(page.getByRole("link", { name: "Continue with Discord" })).toBeVisible();
 
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         expect(overflow).toBeLessThanOrEqual(0);

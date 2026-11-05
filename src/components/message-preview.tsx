@@ -23,7 +23,7 @@ export function DiscordPreview({ platform, message, embed }: { platform: string;
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-2 text-sm">
             <span className="font-semibold">DiscoNotify</span>
-            <span className="rounded bg-brand px-1 text-[10px] font-semibold uppercase text-white">Bot</span>
+            <span className="rounded-sm bg-brand px-1 text-[10px] font-semibold uppercase text-white">Bot</span>
             <span className="text-xs text-text-muted">Today</span>
           </p>
           <p className="mt-0.5 whitespace-pre-wrap break-words text-sm">{text}</p>
@@ -32,7 +32,7 @@ export function DiscordPreview({ platform, message, embed }: { platform: string;
               <p className="text-xs text-text-muted">{values.creator} · {values.platform}</p>
               <p className="mt-1 text-sm font-semibold text-info">{values.title}</p>
               <p className="mt-1 text-xs text-text-muted">{values.description}</p>
-              <div aria-hidden="true" className="mt-2 h-24 rounded bg-surface-raised" />
+              <div aria-hidden="true" className="mt-2 h-24 rounded-sm bg-surface-raised" />
             </div>
           )}
         </div>

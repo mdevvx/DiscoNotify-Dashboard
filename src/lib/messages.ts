@@ -40,11 +40,14 @@ export const M = {
   appName: "DiscoNotify",
   changesApply: "Changes apply within a minute.",
   pauseNote: "Pausing stops all alerts for this server; your settings are kept. Changes apply within a minute.",
-  lapsed: "Your paid time ended. One account per platform keeps working; the others are paused — nothing was deleted.",
+  lapsed: "Your Premium time ended. One account per platform keeps working; the others are paused — nothing was deleted.",
   genericError: "Something went wrong. Please try again.",
   botOffline: "DiscoNotify didn’t answer in time. Please try again in a moment.",
   webhookTip: (channel: string) =>
     `I created a webhook in #${channel} — in Channel settings → Integrations → Webhooks you can change its name and logo and alerts will use them.`,
+  freeSlotFull: (platform: string, limit: number) =>
+    `Your free slot for ${platform} is already in use (${limit} of ${limit}). Get Premium to monitor more ${platform} accounts.`,
+  serverFull: "This server reached the maximum number of accounts.",
   noServers: "You don’t manage any Discord server yet — you need the Manage Server permission.",
   freeBanner: (n: number) =>
     `${n} account${n === 1 ? " is" : "s are"} paused because the free plan checks 1 account per platform. Subscribe to switch ${n === 1 ? "it" : "them"} back on.`,
@@ -61,7 +64,7 @@ export const M = {
   },
 } as const;
 
-/** Error codes (from jobs and the API) that should show an Upgrade button next to the message. */
+/** Error codes (from jobs and the API) that should show a Premium button next to the message. */
 export const UPGRADE_CODES = new Set(["free_limit"]);
 export const RETRY_CODES = new Set(["rate_limited", "platform_error", "platform_unavailable", "bot_offline", "bot_restarted", "timeout", "internal", "discord_error"]);
 

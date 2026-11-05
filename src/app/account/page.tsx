@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeToggle, TopShell } from "@/components/top-shell";
-import { Button, Card, GuildIcon, PageHeader } from "@/components/ui";
+import { LogoutButton } from "@/components/session-actions";
+import { Card, GuildIcon, PageHeader } from "@/components/ui";
 import { avatarUrl } from "@/lib/discord";
 import { getEnv } from "@/lib/env";
 import { requireSession } from "@/lib/page-auth";
@@ -21,7 +22,7 @@ export default async function AccountPage() {
             <p className="text-sm text-text-muted">Logged in as</p>
             <p className="truncate text-lg font-semibold">{name}</p>
           </div>
-          <form action="/api/auth/logout" method="post"><Button type="submit">Log out</Button></form>
+          <LogoutButton variant="button" />
         </Card>
         <Card className="p-5">
           <h2 className="mb-3 font-semibold">Theme</h2>

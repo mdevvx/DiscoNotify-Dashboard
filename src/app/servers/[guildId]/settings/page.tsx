@@ -1,3 +1,4 @@
+import { Settings } from "lucide-react";
 import type { Metadata } from "next";
 import { BotSwitch } from "@/components/bot-switch";
 import { PermissionChecks } from "@/components/permission-checks";
@@ -16,7 +17,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ guild
   const accounts = await listAccounts(guildId);
   return (
     <>
-      <PageHeader title="Settings" description="Server-wide options for DiscoNotify." />
+      <PageHeader title="Settings" icon={<Settings />} description="Server-wide options for DiscoNotify." />
       <div className="grid gap-4">
         <BotSwitch guildId={guildId} initial={ctx.guildRow?.enabled ?? true} />
 

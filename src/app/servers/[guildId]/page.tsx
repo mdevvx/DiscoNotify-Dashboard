@@ -1,12 +1,12 @@
 import { linkButtonClass } from "@/lib/button-styles";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Circle, Radio } from "lucide-react";
+import { AlertTriangle, BellRing, CheckCircle2, Circle, Radio, ShieldAlert, Users, type LucideIcon } from "lucide-react";
 import { BotSwitch } from "@/components/bot-switch";
-import { Badge, Card, EmptyState, PageHeader, PlatformBadge } from "@/components/ui";
+import { Badge, Card, EmptyState, GuildIcon, PlatformBadge } from "@/components/ui";
 import { RelativeTime } from "@/components/relative-time";
 import {
-  countAlerts, getAccountChannels, getLiveAccountIds, getPlatformHealth, listAccounts, listEvents,
+  countAlerts, getAccountChannels, getLiveAccountIds, listAccounts, listEvents,
 } from "@/lib/db";
 import { formatDate, formatNumber } from "@/lib/format";
 import { EVENT_LABELS, M, PLATFORM_META } from "@/lib/messages";
@@ -21,10 +21,9 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
   const { guildId } = await params;
   const ctx = await requireGuildPage(guildId);
   const unlimited = Boolean(ctx.plan?.unlimited);
-  const [accounts, channels, health, day, week, recent] = await Promise.all([
+  const [accounts, channels, day, week, recent] = await Promise.all([
     listAccounts(guildId),
     getAccountChannels(guildId),
-    getPlatformHealth(),
     countAlerts(guildId, ago(86_400_000)),
     countAlerts(guildId, ago(7 * 86_400_000)),
     listEvents(guildId, {}, 1, 10),
@@ -47,23 +46,32 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
     if (ch && !ch.is_valid) attention.push({ key: `c${a.id}`, text: `${name}: the bot lost access to #${ch.name ?? "the channel"} — pick another one.`, href, tone: "danger" });
     if (paused.has(a.id)) attention.push({ key: `p${a.id}`, text: `${name} is paused by the free plan.`, href: `/servers/${guildId}/billing`, tone: "warning" });
   }
-  const used = new Set(accounts.map((a) => a.platform));
-  for (const h of health) {
-    if (used.has(h.platform) && h.status !== "healthy") {
-      attention.push({ key: `h${h.platform}`, text: `${PLATFORM_META[h.platform]?.name ?? h.platform} alerts may be delayed.`, href: accountsHref, tone: "warning" });
-    }
-  }
   if (ctx.plan?.card_status === "past_due") {
     attention.push({ key: "pd", text: "Your card payment failed. Update your card to avoid a pause.", href: `/servers/${guildId}/billing`, tone: "danger" });
   }
 
   const attentionCount = accounts.filter((a) => a.status === "invalid" || a.status === "error").length;
   const isPaid = unlimited;
-  const planName = ctx.plan?.plan === "whitelisted" ? "Whitelisted" : isPaid ? "Paid" : "Free";
+  const planName = ctx.plan?.plan === "whitelisted" ? "Whitelisted" : isPaid ? "Premium" : "Free";
 
   return (
     <>
-      <PageHeader title="Overview" description={`What DiscoNotify is doing in ${ctx.guildRow?.name ?? "your server"}.`} />
+      <section className="relative mb-6 overflow-hidden rounded-2xl border border-border bg-surface p-5 sm:p-6">
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-transparent" />
+        <div aria-hidden="true" className="absolute -right-10 -top-16 size-52 rounded-full bg-brand/20 blur-3xl" />
+        <div className="relative flex flex-wrap items-center gap-4">
+          <GuildIcon name={ctx.guildRow?.name ?? "Server"} icon={ctx.guildRow?.icon_url ?? null} size={64} round className="ring-2 ring-border" />
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-2xl font-semibold tracking-tight sm:text-3xl">{ctx.guildRow?.name ?? "Your server"}</h1>
+            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-text-muted">
+              <Badge tone={isPaid ? "brand" : "neutral"}>{planName}</Badge>
+              {ctx.guildRow?.member_count ? <span>{formatNumber(ctx.guildRow.member_count)} members</span> : null}
+              <span>· {accounts.length} account{accounts.length === 1 ? "" : "s"} monitored</span>
+            </p>
+          </div>
+          <Link href={`/servers/${guildId}/accounts`} className={linkButtonClass("primary")}>Manage accounts</Link>
+        </div>
+      </section>
 
       <div className="grid gap-4">
         <BotSwitch guildId={guildId} initial={ctx.guildRow?.enabled ?? true} />
@@ -78,7 +86,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
                 ["Send a test alert from the account page", `/servers/${guildId}/accounts`],
               ].map(([t, href], i) => (
                 <li key={t} className="flex items-start gap-2.5">
-                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />
+                  <Circle className="mt-0.5 size-4 shrink-0 text-text-muted" aria-hidden="true" />
                   <span>
                     <span className="sr-only">Step {i + 1}: </span>
                     <Link href={href!} className="text-primary-text underline-offset-2 hover:underline">{t}</Link>
@@ -98,13 +106,13 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
               </div>
               <p className="mt-1 text-text-muted">
                 {planName === "Whitelisted" && "Unlimited accounts, never pays."}
-                {planName === "Paid" && `Unlimited accounts per platform${ctx.plan?.paid_until ? ` · paid until ${formatDate(ctx.plan.paid_until)}` : ""}.`}
+                {planName === "Premium" && `Unlimited accounts per platform${ctx.plan?.paid_until ? ` · paid until ${formatDate(ctx.plan.paid_until)}` : ""}.`}
                 {planName === "Free" && "1 account per platform, free forever."}
               </p>
             </div>
             {planName === "Free" && (
               <Link href={`/servers/${guildId}/billing`} className={linkButtonClass("primary")}>
-                Upgrade
+                Get Premium
               </Link>
             )}
           </div>
@@ -120,24 +128,24 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
         </Card>
 
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Tile label="Accounts monitored" value={formatNumber(accounts.length)} />
-          <Tile label="Alerts sent" value={`${formatNumber(day)} / ${formatNumber(week)}`} hint="24 hours / 7 days" />
-          <Tile label="Live now" value={formatNumber(live.size)} />
-          <Tile label="Need attention" value={formatNumber(attentionCount)} tone={attentionCount ? "warning" : undefined} />
+          <Tile icon={Users} label="Accounts monitored" value={formatNumber(accounts.length)} />
+          <Tile icon={BellRing} label="Alerts sent" value={`${formatNumber(day)} / ${formatNumber(week)}`} hint="24 hours / 7 days" />
+          <Tile icon={Radio} label="Live now" value={formatNumber(live.size)} />
+          <Tile icon={ShieldAlert} label="Need attention" value={formatNumber(attentionCount)} tone={attentionCount ? "warning" : undefined} />
         </div>
 
         <Card>
           <h2 className="border-b border-border p-4 font-semibold">Needs attention</h2>
           {attention.length === 0 ? (
             <p className="flex items-center gap-2 p-4 text-text-muted">
-              <CheckCircle2 className="h-4 w-4 text-success" aria-hidden="true" /> Everything looks good.
+              <CheckCircle2 className="size-4 text-success" aria-hidden="true" /> Everything looks good.
             </p>
           ) : (
             <ul className="divide-y divide-border">
               {attention.map((i) => (
                 <li key={i.key}>
                   <Link href={i.href} className="flex min-h-11 items-start gap-2.5 px-4 py-3 hover:bg-surface-raised">
-                    <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${i.tone === "danger" ? "text-danger" : "text-warning"}`} aria-hidden="true" />
+                    <AlertTriangle className={`mt-0.5 size-4 shrink-0 ${i.tone === "danger" ? "text-danger" : "text-warning"}`} aria-hidden="true" />
                     <span className="min-w-0">{i.text}</span>
                   </Link>
                 </li>
@@ -176,14 +184,16 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
   );
 }
 
-function Tile({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: "warning" }) {
+function Tile({ label, value, hint, tone, icon: Icon }: { label: string; value: string; hint?: string; tone?: "warning"; icon: LucideIcon }) {
   return (
     <Card className="p-4">
-      <p className="flex items-center gap-1.5 text-sm text-text-muted">
-        {label === "Live now" && <Radio className="h-3.5 w-3.5" aria-hidden="true" />}
-        {label}
-      </p>
-      <p className={`mt-1 text-2xl font-semibold tabular-nums ${tone === "warning" ? "text-warning" : ""}`}>{value}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-text-muted">{label}</p>
+        <span aria-hidden="true" className={`flex size-8 items-center justify-center rounded-lg ${tone === "warning" ? "bg-warning/15 text-warning" : "bg-primary/10 text-primary-text"}`}>
+          <Icon className="size-4" />
+        </span>
+      </div>
+      <p className={`mt-2 text-3xl font-semibold tabular-nums tracking-tight ${tone === "warning" ? "text-warning" : ""}`}>{value}</p>
       {hint && <p className="text-xs text-text-muted">{hint}</p>}
     </Card>
   );

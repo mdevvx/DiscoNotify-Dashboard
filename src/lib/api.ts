@@ -4,10 +4,11 @@ import { z } from "zod";
 import { getEnv } from "./env";
 import { DbError, getAccount, getGuild, insertAudit } from "./db";
 import { BotError } from "./bot-jobs";
-import { refreshGuildList } from "./discord";
+import { refreshSessionTokens } from "./discord";
+import { findGuild, getManageableGuilds } from "./guild-cache";
 import { isSnowflake } from "./permissions";
 import { rateLimit } from "./rate-limit";
-import { findGuild, getSession, guildsStale, type SessionGuild } from "./session";
+import { getSession, type SessionGuild } from "./session";
 
 export class HttpError extends Error {
   constructor(
@@ -72,14 +73,14 @@ export async function requireApiGuild(
     const key = `${opts.rate.name}:${opts.rate.perGuild ? guildId : session.user.id}`;
     if (!rateLimit(key, opts.rate.max).ok) throw new HttpError(429, "rate_limited", "Too many requests, try again in a minute.");
   }
-  if (guildsStale(session)) {
-    if (!(await refreshGuildList(session))) {
-      session.destroy();
-      throw new HttpError(401, "unauthenticated", "Please log in again.");
-    }
+  let guilds = await getManageableGuilds(session);
+  if (!guilds && (await refreshSessionTokens(session))) guilds = await getManageableGuilds(session);
+  if (!guilds) {
+    session.destroy();
+    throw new HttpError(401, "unauthenticated", "Please log in again.");
   }
   if (!isSnowflake(guildId)) throw new HttpError(404, "not_found", "Not found.");
-  const guild = findGuild(session, guildId);
+  const guild = findGuild(guilds, guildId);
   if (!guild) throw new HttpError(404, "not_found", "Not found.");
   if (opts.needsBot !== false) {
     const row = await getGuild(guildId);

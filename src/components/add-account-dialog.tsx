@@ -4,7 +4,7 @@ import { linkButtonClass } from "@/lib/button-styles";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/client-api";
 import { useGuildInfo } from "@/lib/use-guild-info";
@@ -40,9 +40,10 @@ export function AddAccountDialog({
   const info = data?.info;
   const freeLimit = info?.plan.free_accounts_per_platform ?? 1;
   const maxTotal = info?.plan.max_accounts_per_server ?? 25;
-  const isUnlimited = info ? info.plan.unlimited : unlimited;
+  // The plan view in the database is the dashboard's source of truth (contract 6.3); the bot enforces it again on add.
   const platforms = useMemo(() => (info?.platforms ?? []).filter((p) => p.available), [info]);
-  const blocked = (key: string) => (!isUnlimited && (counts[key] ?? 0) >= freeLimit) || total >= maxTotal;
+  const slotFull = (key: string) => !unlimited && (counts[key] ?? 0) >= freeLimit;
+  const blocked = (key: string) => slotFull(key) || total >= maxTotal;
   const platform = platformChoice || (platforms.find((p) => !blocked(p.key)) ?? platforms[0])?.key || "";
   const selected = platforms.find((p) => p.key === platform);
 
@@ -71,7 +72,8 @@ export function AddAccountDialog({
       router.refresh();
     } catch (e2) {
       const ae = e2 as ApiError;
-      setErr({ code: ae.code ?? "internal", message: friendlyError(ae.code, ae.message) });
+      const code = ae.code ?? "internal";
+      setErr({ code, message: code === "free_limit" ? M.freeSlotFull(selected?.name ?? platform, freeLimit) : friendlyError(code, ae.message) });
     } finally {
       setBusy(false);
     }
@@ -97,18 +99,22 @@ export function AddAccountDialog({
           <Field label="Platform" htmlFor="add-platform">
             <Select id="add-platform" value={platform} onChange={(e) => { setPlatform(e.target.value); setErr(null); }} required>
               {platforms.map((p) => (
-                <option key={p.key} value={p.key} disabled={blocked(p.key)}>
+                <option key={p.key} value={p.key}>
                   {p.name}
-                  {blocked(p.key) ? " — upgrade to add more" : ""}
+                  {slotFull(p.key) ? " — free slot used" : ""}
                 </option>
               ))}
             </Select>
           </Field>
           {platform && blocked(platform) && (
-            <p role="status" className="text-sm text-warning">
-              The free plan monitors {freeLimit} account per platform.{" "}
-              <Link href={`/servers/${guildId}/billing`} className="underline">Upgrade</Link> to add more.
-            </p>
+            <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+              <p className="min-w-0 flex-1">{slotFull(platform) ? M.freeSlotFull(selected?.name ?? platform, freeLimit) : M.serverFull}</p>
+              {slotFull(platform) && (
+                <Link href={`/servers/${guildId}/billing`} className={linkButtonClass("primary", "sm")}>
+                  <Sparkles className="size-3.5" aria-hidden="true" /> Get Premium
+                </Link>
+              )}
+            </div>
           )}
           <Field label={selected?.account_label ?? "Account"} htmlFor="add-identifier" hint={selected?.placeholder} error={err && ["account_not_found", "duplicate", "bad_request"].includes(err.code) ? err.message : null}>
             <Input id="add-identifier" value={identifier} onChange={(e) => setIdentifier(e.target.value)} maxLength={200} required placeholder={selected?.placeholder} autoComplete="off" />
@@ -140,7 +146,7 @@ export function AddAccountDialog({
           </Field>
           {everyoneLocked && (
             <p className="flex items-center gap-1.5 text-xs text-text-muted">
-              <Lock className="h-3 w-3" aria-hidden="true" /> Some mentions are locked for your account.
+              <Lock className="size-3" aria-hidden="true" /> Some mentions are locked for your account.
             </p>
           )}
 
@@ -149,7 +155,7 @@ export function AddAccountDialog({
               <p>{err.message}</p>
               <div className="mt-2 flex gap-2">
                 {UPGRADE_CODES.has(err.code) && (
-                  <Link href={`/servers/${guildId}/billing`} className={linkButtonClass("primary", "sm")}>Upgrade</Link>
+                  <Link href={`/servers/${guildId}/billing`} className={linkButtonClass("primary", "sm")}>Get Premium</Link>
                 )}
                 {RETRY_CODES.has(err.code) && <Button size="sm" type="submit">Try again</Button>}
               </div>

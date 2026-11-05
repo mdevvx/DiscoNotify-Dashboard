@@ -14,7 +14,7 @@
   --primary-hover: #b02033;
   --primary-foreground: #ffffff;
   --primary-text: #b3202f;
-  --brand: #e2364a;
+  --brand: #e23748;
   --success: #15803d;
   --warning: #92590a;
   --danger: #b91c1c;
@@ -31,22 +31,22 @@
 }
 
 .dark {
-  --background: #0b0b0e;
-  --surface: #131318;
-  --surface-raised: #1b1b22;
-  --border: #2b2b35;
-  --text: #ececf1;
-  --text-muted: #a3a3b0;
+  --background: #0a0b12;
+  --surface: #111320;
+  --surface-raised: #1a1d2e;
+  --border: #272b40;
+  --text: #eceef7;
+  --text-muted: #a5abc4;
   --primary: #c8283b;
   --primary-hover: #d9304a;
   --primary-foreground: #ffffff;
-  --primary-text: #ff7083;
+  --primary-text: #ff7a8c;
   --success: #4ade80;
   --warning: #fbbf24;
   --danger: #f87171;
   --info: #7aa7ff;
   --ring: #7aa7ff;
-  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-popover: 0 12px 32px rgb(0 0 0 / 0.55);
 }
 
 @theme inline {
@@ -129,3 +129,45 @@ body {
   to { opacity: 1; transform: none; }
 }
 .fade-in { animation: fade-in 180ms ease-out; }
+
+/* ---------- ambient background + motion used by the login page and shells ---------- */
+body {
+  background-image:
+    radial-gradient(52rem 26rem at 50% -8%, color-mix(in oklab, var(--brand) 11%, transparent), transparent 70%),
+    radial-gradient(40rem 24rem at 100% 100%, color-mix(in oklab, var(--platform-twitch) 7%, transparent), transparent 70%);
+  background-attachment: fixed;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--text) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--text) 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 40% 30%, #000 20%, transparent 72%);
+}
+
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes ring { 0% { transform: scale(0.8); opacity: 0.7; } 100% { transform: scale(2.2); opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.float-a { animation: float-y 6s ease-in-out infinite; }
+.float-b { animation: float-y 7.5s ease-in-out -2s infinite; }
+.float-c { animation: float-y 6.8s ease-in-out -4s infinite; }
+.ring-live::after {
+  content: ""; position: absolute; inset: 0; border-radius: 9999px; border: 2px solid currentColor;
+  animation: ring 2s ease-out infinite;
+}
+.rise { animation: rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.rise-2 { animation-delay: 90ms; }
+.rise-3 { animation-delay: 180ms; }
+.text-gradient {
+  background: linear-gradient(120deg, var(--text) 30%, var(--primary-text));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.glass {
+  background: color-mix(in oklab, var(--surface) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-a, .float-b, .float-c, .ring-live::after, .rise { animation: none !important; }
+}

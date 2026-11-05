@@ -10,6 +10,12 @@ export class ApiError extends Error {
   }
 }
 
+let onUnauthenticated: ((path: string) => void) | null = null;
+/** Registered once by <Providers> so a lost session moves to /login with client-side navigation (no page reload). */
+export function setUnauthenticatedHandler(fn: ((path: string) => void) | null) {
+  onUnauthenticated = fn;
+}
+
 /** Browser-side call to this app's own route handlers. Resolves to `data` or throws ApiError. */
 export async function api<T = unknown>(path: string, method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" = "GET", body?: unknown): Promise<T> {
   let res: Response;
@@ -30,9 +36,7 @@ export async function api<T = unknown>(path: string, method: "GET" | "POST" | "P
     /* non-JSON body */
   }
   if (res.status === 401) {
-    // Full navigation on purpose: the session is gone, so reset all client state.
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.assign(`/login?next=${encodeURIComponent(window.location.pathname)}`);
+    onUnauthenticated?.(window.location.pathname);
     throw new ApiError("unauthenticated", "Please log in again.", 401);
   }
   if (!res.ok || !json?.ok) {

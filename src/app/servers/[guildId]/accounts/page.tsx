@@ -1,3 +1,4 @@
+import { Users } from "lucide-react";
 import type { Metadata } from "next";
 import { AccountsView, type AccountView } from "@/components/accounts-view";
 import { PageHeader } from "@/components/ui";
@@ -38,7 +39,7 @@ export default async function AccountsPage({ params }: { params: Promise<{ guild
 
   return (
     <>
-      <PageHeader title="Accounts" description="The creators DiscoNotify watches for this server." />
+      <PageHeader title="Accounts" icon={<Users />} description="The creators DiscoNotify watches for this server." />
       <AccountsView guildId={guildId} accounts={views} unlimited={unlimited} pausedCount={paused.size} freePerPlatform={DEFAULT_FREE_PER_PLATFORM} />
     </>
   );

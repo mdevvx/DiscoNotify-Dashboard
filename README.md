@@ -71,8 +71,8 @@ refuses to serve, with a message saying why.
 ## 3. What the product does
 
 **Plans.** Every server is on **Free** by default, forever: **1 monitored account per platform** (one YouTube channel, one Twitch,
-one Kick, one Instagram, one X, one TikTok). **Paid** ($1.99/month per server) removes that limit, up to 25 accounts per server.
-Whitelisted servers behave like Paid and never pay. There is no trial.
+one Kick, one Instagram, one X, one TikTok). **Premium** ($1.99/month per server) removes that limit, up to 25 accounts per server.
+Whitelisted servers behave like Premium and never pay. There is no trial.
 
 **Where the limit shows up**
 
@@ -121,9 +121,8 @@ The browser never talks to Supabase or any payment provider. It only calls this 
 1. `/api/auth/login` sets a random `state` cookie and redirects to Discord (scopes **only** `identify guilds`).
 2. `/api/auth/callback` checks `state`, exchanges the code, reads the user and server list, and keeps only servers the person
    **manages** (owner, Manage Server `0x20` or Administrator `0x8`, compared with BigInt).
-3. The session is an encrypted `HttpOnly; Secure; SameSite=Lax` cookie (7 days) holding the user, the compact server list and the
-   Discord tokens.
-4. The list is re-read from Discord when older than 10 minutes (pages redirect through `/api/auth/refresh`; API calls refresh inline),
+3. The session is an encrypted `HttpOnly; Secure; SameSite=Lax` cookie (7 days) holding only the user and the Discord tokens.
+4. The server list is re-read from Discord when older than 10 minutes,
    so someone who loses Manage Server loses access within 10 minutes. The Refresh button is limited to once per 30 s.
 5. Log out clears the cookie and revokes the Discord token.
 
@@ -214,7 +213,7 @@ e2e/                           Playwright tests
 
 Design tokens (colours, radius, shadow) are CSS variables in `src/app/globals.css`; components use semantic names such as
 `bg-surface`, `text-text-muted`, `bg-primary`. The logo is `public/logo.svg` / `src/app/icon.svg` / `src/components/logo.tsx`.
-Brand red is `#E2364A`; buttons use `#C8283B` so white text keeps AA contrast.
+The logo is the website's own artwork (red `#e23748`, white). Accents use that exact red; buttons use a slightly deeper `#c8283b` because white text on `#e23748` is 4.3:1, below the AA minimum of 4.5:1.
 
 ---
 
@@ -241,8 +240,8 @@ zod validation on every body; `next=` only to same-site paths; non-managers get 
 
 ## 8. Known limits
 
-- **Cookie size.** Cookies hold about 4 KB. People who manage roughly 30+ servers get shorter names, then no names/icons, then a
-  trimmed list (owned servers first). A server-side session store would remove this.
+- **Server list cache.** The list of servers a person manages (names, icons) is kept in memory per server instance, not in the cookie, and
+  re-read from Discord every 10 minutes. A cold instance re-reads it with the token in the cookie. Use a shared store if you want it shared.
 - **Rate limits and the `guild_info` cache are in memory,** per server instance. Use a shared store (Redis) if you run several instances.
 - The Accounts list shows pings as "@Role" because role names come from `guild_info`, which is only loaded on the account page and in
   the Add dialog.

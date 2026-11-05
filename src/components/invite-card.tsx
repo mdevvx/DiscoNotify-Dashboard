@@ -50,7 +50,7 @@ export function InviteCard({ guildId, guildName, href }: { guildId: string; guil
       <p aria-live="polite" className="mt-4 min-h-5 text-sm text-text-muted">
         {waiting && (
           <span className="inline-flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Waiting for the bot to join…
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Waiting for the bot to join…
           </span>
         )}
         {gaveUp && "Still not here. Finish adding the bot in Discord, then reload this page."}

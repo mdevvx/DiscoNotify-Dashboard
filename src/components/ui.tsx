@@ -21,7 +21,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
 ) {
   return (
     <button ref={ref} type={type} disabled={disabled || loading} aria-busy={loading || undefined} className={cn(buttonVariants({ variant, size }), className)} {...props}>
-      {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+      {loading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
       {children}
     </button>
   );
@@ -29,15 +29,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
 
 // ---------- Layout bits ----------
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-lg border border-border bg-surface", className)} {...props} />;
+  return <div className={cn("rounded-xl border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition-colors duration-150", className)} {...props} />;
 }
 
-export function PageHeader({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {
+export function PageHeader({ title, description, action, icon }: { title: string; description?: string; action?: React.ReactNode; icon?: React.ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {description && <p className="mt-1 max-w-2xl text-text-muted">{description}</p>}
+      <div className="flex min-w-0 items-start gap-3">
+        {icon && (
+          <span aria-hidden="true" className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary-text ring-1 ring-primary/20 [&_svg]:h-5 [&_svg]:w-5">
+            {icon}
+          </span>
+        )}
+        <div className="min-w-0">
+          <h1 className="text-[26px] font-semibold leading-tight tracking-tight">{title}</h1>
+          {description && <p className="mt-1 max-w-2xl text-text-muted">{description}</p>}
+        </div>
       </div>
       {action && <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div>}
     </div>
@@ -81,18 +88,23 @@ export function PlatformBadge({ platform }: { platform: string }) {
   const meta = PLATFORM_META[platform];
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium">
-      <span aria-hidden="true" className="h-2 w-2 rounded-full" style={{ background: meta?.color ?? "var(--text-muted)" }} />
+      <span aria-hidden="true" className="size-2 rounded-full" style={{ background: meta?.color ?? "var(--text-muted)" }} />
       {meta?.name ?? platform}
     </span>
   );
 }
 
-export function GuildIcon({ name, icon, size = 40 }: { name: string; icon: string | null; size?: number }) {
+export function GuildIcon({ name, icon, size = 40, round = false, className }: { name: string; icon: string | null; size?: number; round?: boolean; className?: string }) {
+  const shape = round ? "rounded-full" : "rounded-lg";
   if (icon) {
-    return <Image src={icon} alt="" width={size} height={size} unoptimized className="shrink-0 rounded-lg bg-surface-raised" style={{ width: size, height: size }} />;
+    return <Image src={icon} alt="" width={size} height={size} unoptimized className={cn("shrink-0 bg-surface-raised object-cover", shape, className)} style={{ width: size, height: size }} />;
   }
   return (
-    <span aria-hidden="true" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-surface-raised text-sm font-semibold text-text-muted" style={{ width: size, height: size }}>
+    <span
+      aria-hidden="true"
+      className={cn("inline-flex shrink-0 items-center justify-center bg-linear-to-br from-surface-raised to-surface font-semibold text-text-muted", shape, className)}
+      style={{ width: size, height: size, fontSize: Math.max(11, size * 0.34) }}
+    >
       {(name || "?").trim().slice(0, 2).toUpperCase()}
     </span>
   );
@@ -141,7 +153,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, React.ComponentPropsWi
       )}
       {...p}
     >
-      <SwitchPrimitive.Thumb className="block h-4 w-4 translate-x-1 rounded-full bg-text-muted transition-transform duration-150 data-[state=checked]:translate-x-6 data-[state=checked]:bg-white max-sm:h-5 max-sm:w-5" />
+      <SwitchPrimitive.Thumb className="block size-4 translate-x-1 rounded-full bg-text-muted transition-transform duration-150 data-[state=checked]:translate-x-6 data-[state=checked]:bg-white max-sm:size-5" />
     </SwitchPrimitive.Root>
   );
 });
@@ -172,7 +184,7 @@ export function Dialog({
             </div>
             <DialogPrimitive.Close asChild>
               <Button variant="ghost" size="icon" aria-label="Close">
-                <X className="h-4 w-4" />
+                <X className="size-4" />
               </Button>
             </DialogPrimitive.Close>
           </div>

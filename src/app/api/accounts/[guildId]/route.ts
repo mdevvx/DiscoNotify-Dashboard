@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { audit, HttpError, idSchema, parseBody, requireApiGuild, respond } from "@/lib/api";
 import { callBot, guildInfo } from "@/lib/bot-jobs";
+import { getGuildPlan, listAccounts } from "@/lib/db";
+import { DEFAULT_FREE_PER_PLATFORM, platformCounts } from "@/lib/plans";
+import { M, PLATFORM_META } from "@/lib/messages";
 import { mentionViolation } from "@/lib/permissions";
 
 const body = z.object({
@@ -21,6 +24,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ guildId
   return respond(async () => {
     const ctx = await requireApiGuild(req, guildId, { rate: { name: "add", max: 10 } });
     const b = await parseBody(req, body);
+
+    // Free plan: one account per platform. Checked here for a clear message; the bot enforces it again.
+    const [plan, existing] = await Promise.all([getGuildPlan(guildId), listAccounts(guildId)]);
+    if (!plan?.unlimited && (platformCounts(existing)[b.platform] ?? 0) >= DEFAULT_FREE_PER_PLATFORM) {
+      throw new HttpError(403, "free_limit", M.freeSlotFull(PLATFORM_META[b.platform]?.name ?? b.platform, DEFAULT_FREE_PER_PLATFORM));
+    }
     if (b.mention_role_id) {
       const info = await guildInfo(guildId, ctx.userId);
       const role = info.roles.find((r) => r.id === b.mention_role_id);

@@ -44,7 +44,7 @@ export default async function AccountPage({ params }: { params: Promise<{ guildI
   return (
     <>
       <Link href={`/servers/${guildId}/accounts`} className="mb-4 inline-flex min-h-9 items-center gap-1 text-sm text-text-muted hover:text-text">
-        <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Accounts
+        <ChevronLeft className="size-4" aria-hidden="true" /> Accounts
       </Link>
       <AccountSettings
         guildId={guildId}

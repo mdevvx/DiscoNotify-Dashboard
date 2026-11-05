@@ -1,7 +1,9 @@
+import { Activity } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { Button, Card, EmptyState, Input, PageHeader, PlatformBadge, Select } from "@/components/ui";
+import { ActivityFilters } from "@/components/activity-filters";
+import { Card, EmptyState, PageHeader, PlatformBadge } from "@/components/ui";
 import { RelativeTime } from "@/components/relative-time";
 import { listAccounts, listEvents, type EventFilters } from "@/lib/db";
 import { EVENT_LABELS, PLATFORM_META } from "@/lib/messages";
@@ -65,27 +67,13 @@ export default async function ActivityPage({
 
   return (
     <>
-      <PageHeader title="Activity" description="Alerts DiscoNotify has posted in this server." />
-      <form method="get" className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6" aria-label="Filter alerts">
-        <Select name="platform" defaultValue={filters.platform ?? ""} aria-label="Platform">
-          <option value="">All platforms</option>
-          {PLATFORM_KEYS.map((p) => <option key={p} value={p}>{PLATFORM_META[p]?.name}</option>)}
-        </Select>
-        <Select name="account" defaultValue={filters.accountId ?? ""} aria-label="Account">
-          <option value="">All accounts</option>
-          {accounts.map((a) => <option key={a.id} value={a.id}>{a.username}</option>)}
-        </Select>
-        <Select name="type" defaultValue={filters.eventType ?? ""} aria-label="Alert type">
-          <option value="">All types</option>
-          {Object.entries(EVENT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </Select>
-        <Input type="date" name="from" defaultValue={dateOk(from) ? from : ""} aria-label="From date" />
-        <Input type="date" name="to" defaultValue={dateOk(to) ? to : ""} aria-label="To date" />
-        <div className="flex gap-2">
-          <Button type="submit" variant="primary" className="flex-1">Filter</Button>
-          {filtered && <Link href="?" className="inline-flex min-h-9 items-center px-2 text-sm text-text-muted hover:text-text">Clear</Link>}
-        </div>
-      </form>
+      <PageHeader title="Activity" icon={<Activity />} description="Alerts DiscoNotify has posted in this server." />
+      <ActivityFilters
+        initial={{ platform: filters.platform ?? "", account: filters.accountId ? account : "", type: filters.eventType ? type : "", from: dateOk(from) ? from : "", to: dateOk(to) ? to : "" }}
+        platforms={PLATFORM_KEYS.map((p) => ({ value: p, label: PLATFORM_META[p]?.name ?? p }))}
+        accounts={accounts.map((a) => ({ value: a.id, label: a.username }))}
+        types={Object.entries(EVENT_LABELS).map(([value, label]) => ({ value, label }))}
+      />
 
       <Card>
         {rows.length === 0 ? (
@@ -104,7 +92,7 @@ export default async function ActivityPage({
                     <p className="truncate">
                       {url ? (
                         <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-center gap-1 font-medium hover:underline">
-                          <span className="truncate">{title}</span><ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
+                          <span className="truncate">{title}</span><ExternalLink className="size-3 shrink-0" aria-hidden="true" />
                         </a>
                       ) : <span className="font-medium">{title}</span>}
                     </p>

@@ -29,7 +29,7 @@ export function PermissionChecks({ guildId }: { guildId: string }) {
     <ul className="space-y-1.5 text-sm">
       {rows.map((r) => (
         <li key={r.label} className="flex items-center gap-2">
-          {r.ok ? <Check className="h-4 w-4 text-success" aria-label="Granted" /> : r.label === "Mention Everyone" ? <Minus className="h-4 w-4 text-warning" aria-label="Not granted" /> : <X className="h-4 w-4 text-danger" aria-label="Missing" />}
+          {r.ok ? <Check className="size-4 text-success" aria-label="Granted" /> : r.label === "Mention Everyone" ? <Minus className="size-4 text-warning" aria-label="Not granted" /> : <X className="size-4 text-danger" aria-label="Missing" />}
           <span>{r.label}</span>
           {r.note && <span className="text-text-muted">· {r.note}</span>}
         </li>

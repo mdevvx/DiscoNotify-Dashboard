@@ -18,9 +18,9 @@ export function CopyButton({ value, label = "Copy" }: { value: string; label?: s
           /* clipboard unavailable */
         }
       }}
-      className="inline-flex h-7 w-7 items-center justify-center rounded text-text-muted hover:bg-surface-raised hover:text-text max-sm:h-9 max-sm:w-9"
+      className="inline-flex size-7 items-center justify-center rounded-sm text-text-muted hover:bg-surface-raised hover:text-text max-sm:size-9"
     >
-      {done ? <Check className="h-3.5 w-3.5 text-success" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
+      {done ? <Check className="size-3.5 text-success" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
     </button>
   );
 }
