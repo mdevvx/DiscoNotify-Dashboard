@@ -38,7 +38,12 @@ let cached: Env | undefined;
 /** Validates once and throws a readable message listing every missing or invalid variable. */
 export function getEnv(): Env {
   if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
+  // Hosting dashboards often keep the quotes or a trailing space/newline when a value is pasted (FOO="bar"): strip them.
+  const clean: Record<string, string | undefined> = {};
+  for (const [k, v] of Object.entries(process.env)) {
+    clean[k] = typeof v === "string" ? v.trim().replace(/^(["'])(.*)\1$/s, "$2").trim() : v;
+  }
+  const parsed = schema.safeParse(clean);
   if (!parsed.success) {
     const lines = parsed.error.issues.map((i) => `  - ${i.path.join(".")}: ${i.message}`);
     throw new Error(`DiscoNotify dashboard: invalid environment\n${lines.join("\n")}`);

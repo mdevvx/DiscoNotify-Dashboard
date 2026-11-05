@@ -62,7 +62,12 @@ async function tokenRequest(body: Record<string, string>): Promise<DiscordTokens
     }),
     cache: "no-store",
   });
-  if (!res.ok) throw new DiscordError(res.status, "token_request_failed");
+  if (!res.ok) {
+    // Discord's error is a short code such as invalid_client (wrong client id/secret), invalid_grant (bad or reused code,
+    // redirect_uri mismatch). It never contains secrets, so it is safe to log and it makes the cause obvious.
+    const detail = (await res.json().catch(() => null)) as { error?: string; error_description?: string } | null;
+    throw new DiscordError(res.status, `token_request_failed: ${[detail?.error, detail?.error_description].filter(Boolean).join(" - ") || "no detail"}`);
+  }
   return (await res.json()) as DiscordTokens;
 }
 
