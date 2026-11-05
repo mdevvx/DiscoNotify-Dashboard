@@ -19,8 +19,8 @@
   --warning: #92590a;
   --danger: #b91c1c;
   --info: #1d4ed8;
-  --ring: #1d4ed8;
-  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.12);
+  --ring: var(--brand);
+  --shadow-popover: 0 6px 20px rgb(15 15 30 / 0.10);
 
   --platform-youtube: #ff0000;
   --platform-twitch: #9146ff;
@@ -45,8 +45,8 @@
   --warning: #fbbf24;
   --danger: #f87171;
   --info: #7aa7ff;
-  --ring: #7aa7ff;
-  --shadow-popover: 0 12px 32px rgb(0 0 0 / 0.55);
+  --ring: var(--brand);
+  --shadow-popover: 0 6px 20px rgb(0 0 0 / 0.35);
 }
 
 @theme inline {
@@ -171,3 +171,29 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .float-a, .float-b, .float-c, .ring-live::after, .rise { animation: none !important; }
 }
+
+
+/* ---------- native controls follow the theme ---------- */
+:root { accent-color: var(--brand); }
+::selection { background: color-mix(in oklab, var(--brand) 35%, transparent); color: inherit; }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--text) 24%, transparent) transparent;
+}
+*:hover { scrollbar-color: color-mix(in oklab, var(--text) 38%, transparent) transparent; }
+
+select.field-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355555f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+.dark select.field-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a5abc4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+select.field-select option { background: var(--surface); color: var(--text); }
+
+input[type="search"]::-webkit-search-cancel-button { filter: grayscale(1); opacity: 0.6; }

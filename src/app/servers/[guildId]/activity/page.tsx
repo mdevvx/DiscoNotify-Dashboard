@@ -1,3 +1,4 @@
+import { linkButtonClass } from "@/lib/button-styles";
 import { Activity } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -108,9 +109,9 @@ export default async function ActivityPage({
 
       {pages > 1 && (
         <nav aria-label="Pagination" className="mt-4 flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={qs(page - 1)} className="min-h-9 py-2 text-primary-text hover:underline">← Newer</Link> : <span />}
+          {page > 1 ? <Link href={qs(page - 1)} className={linkButtonClass("secondary")}>← Newer</Link> : <span />}
           <span className="text-text-muted">Page {page} of {pages}</span>
-          {page < pages ? <Link href={qs(page + 1)} className="min-h-9 py-2 text-primary-text hover:underline">Older →</Link> : <span />}
+          {page < pages ? <Link href={qs(page + 1)} className={linkButtonClass("secondary")}>Older →</Link> : <span />}
         </nav>
       )}
     </>

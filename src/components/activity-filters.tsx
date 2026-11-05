@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Button, Input, Select } from "@/components/ui";
+import { DateField } from "@/components/date-field";
+import { Button, Select } from "@/components/ui";
 
 export interface FilterValues {
   platform: string;
@@ -57,8 +58,8 @@ export function ActivityFilters({ initial, platforms, accounts, types }: { initi
           <option key={o.value} value={o.value}>{o.label}</option>
         ))}
       </Select>
-      <Input type="date" value={v.from} onChange={set("from")} aria-label="From date" />
-      <Input type="date" value={v.to} onChange={set("to")} aria-label="To date" />
+      <DateField label="From date" placeholder="From date" value={v.from} onChange={(x) => setV((s) => ({ ...s, from: x }))} />
+      <DateField label="To date" placeholder="To date" value={v.to} onChange={(x) => setV((s) => ({ ...s, to: x }))} />
       <div className="flex gap-2">
         <Button type="submit" variant="primary" className="flex-1" loading={pending}>Filter</Button>
         {filtered && (

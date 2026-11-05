@@ -34,10 +34,10 @@ export default async function BillingPage({ params }: { params: Promise<{ guildI
 
   const premiumStatus: Record<Exclude<PlanState, "free_new" | "free_lapsed">, { title: string; body: string; tone: "brand" | "warning" | "danger" }> = {
     paid_card: { title: "You’re on Premium", body: `Renews ${formatDate(until)} by card.`, tone: "brand" },
-    paid_card_cancelling: { title: `Cancelled — Premium until ${formatDate(cancelsAt ?? until)}`, body: "Everything keeps working until then. Resubscribe once it ends.", tone: "warning" },
+    paid_card_cancelling: { title: `Cancelled, Premium until ${formatDate(cancelsAt ?? until)}`, body: "Everything keeps working until then. Resubscribe once it ends.", tone: "warning" },
     paid_card_past_due: { title: "Payment failed", body: "We’ll retry. Update your card to avoid a pause.", tone: "danger" },
     paid_crypto: { title: "You’re on Premium", body: `Prepaid until ${formatDate(until)}.`, tone: "brand" },
-    whitelisted: { title: "Whitelisted", body: "Unlimited accounts — this server never pays.", tone: "brand" },
+    whitelisted: { title: "Whitelisted", body: "Unlimited accounts. This server never pays.", tone: "brand" },
   };
 
   const price = env.BILLING_PRICE_USD;
@@ -74,7 +74,7 @@ export default async function BillingPage({ params }: { params: Promise<{ guildI
               </ul>
             </Card>
 
-            <Card className="relative flex flex-col overflow-hidden border-brand/50 p-6 shadow-[0_20px_50px_-30px_var(--brand)]">
+            <Card className="relative flex flex-col overflow-hidden border-brand/50 p-6">
               <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-transparent" />
               <div className="relative flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-lg font-semibold">
@@ -101,8 +101,8 @@ export default async function BillingPage({ params }: { params: Promise<{ guildI
               <div className="relative mt-6 border-t border-border pt-5">
                 <p className="mb-3 text-sm font-medium">Pay your way</p>
                 <ul className="mb-5 grid gap-2 text-sm text-text-muted">
-                  <li className="flex items-center gap-2.5"><CreditCard className="size-4 shrink-0" aria-hidden="true" /> Card — monthly subscription, cancel any time</li>
-                  {crypto && <li className="flex items-center gap-2.5"><Landmark className="size-4 shrink-0" aria-hidden="true" /> Crypto — prepaid 3, 6 or 12 months</li>}
+                  <li className="flex items-center gap-2.5"><CreditCard className="size-4 shrink-0" aria-hidden="true" /> Card: monthly subscription, cancel any time</li>
+                  {crypto && <li className="flex items-center gap-2.5"><Landmark className="size-4 shrink-0" aria-hidden="true" /> Crypto: prepaid 3, 6 or 12 months</li>}
                 </ul>
                 <BillingActions guildId={guildId} state={state} price={price} cryptoEnabled={crypto} links={links} />
               </div>
@@ -139,7 +139,7 @@ export default async function BillingPage({ params }: { params: Promise<{ guildI
                     <tr key={p.id}>
                       <td className="p-3">{formatDate(p.paid_at ?? p.created_at)}</td>
                       <td className="p-3">{p.provider === "polar" ? "Card" : "Crypto"}</td>
-                      <td className="p-3 tabular-nums">{p.months ?? "—"}</td>
+                      <td className="p-3 tabular-nums">{p.months ?? "-"}</td>
                       <td className="p-3 tabular-nums">{formatUsd(p.amount_usd)}</td>
                       <td className="p-3"><Badge tone={p.status === "paid" ? "success" : p.status === "pending" ? "info" : "danger"}>{p.status.charAt(0).toUpperCase() + p.status.slice(1)}</Badge></td>
                     </tr>

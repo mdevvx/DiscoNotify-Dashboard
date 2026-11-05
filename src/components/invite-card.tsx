@@ -43,7 +43,7 @@ export function InviteCard({ guildId, guildName, href }: { guildId: string; guil
   return (
     <Card className="mx-auto mt-8 max-w-lg p-8 text-center">
       <h1 className="text-xl font-semibold">Add DiscoNotify to {guildName}</h1>
-      <p className="mt-2 text-text-muted">The bot isn’t in this server yet. Add it, then come back — this page continues by itself.</p>
+      <p className="mt-2 text-text-muted">The bot isn’t in this server yet. Add it, then come back. This page continues by itself.</p>
       <a href={href} target="_blank" rel="noopener noreferrer" onClick={start} className={`${linkButtonClass("primary")} mt-6`}>
         Add DiscoNotify
       </a>

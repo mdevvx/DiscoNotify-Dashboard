@@ -40,27 +40,27 @@ export const M = {
   appName: "DiscoNotify",
   changesApply: "Changes apply within a minute.",
   pauseNote: "Pausing stops all alerts for this server; your settings are kept. Changes apply within a minute.",
-  lapsed: "Your Premium time ended. One account per platform keeps working; the others are paused — nothing was deleted.",
+  lapsed: "Your Premium time ended. One account per platform keeps working; the others are paused; nothing was deleted.",
   genericError: "Something went wrong. Please try again.",
   botOffline: "DiscoNotify didn’t answer in time. Please try again in a moment.",
   webhookTip: (channel: string) =>
-    `I created a webhook in #${channel} — in Channel settings → Integrations → Webhooks you can change its name and logo and alerts will use them.`,
+    `I created a webhook in #${channel}. In Channel settings → Integrations → Webhooks you can change its name and logo, and alerts will use them.`,
   freeSlotFull: (platform: string, limit: number) =>
     `Your free slot for ${platform} is already in use (${limit} of ${limit}). Get Premium to monitor more ${platform} accounts.`,
   serverFull: "This server reached the maximum number of accounts.",
-  noServers: "You don’t manage any Discord server yet — you need the Manage Server permission.",
+  noServers: "You don’t manage any Discord server yet. You need the Manage Server permission.",
   freeBanner: (n: number) =>
     `${n} account${n === 1 ? " is" : "s are"} paused because the free plan checks 1 account per platform. Subscribe to switch ${n === 1 ? "it" : "them"} back on.`,
   statusLabel: {
     active: "Active",
     paused: "Paused",
-    pausedFree: "Paused — free plan",
+    pausedFree: "Paused (free plan)",
     invalid: "Not found",
     error: "Retrying",
   },
   statusHelp: {
-    invalid: "This account can’t be found any more — remove it and add it again.",
-    error: "It couldn’t be checked just now — retrying automatically.",
+    invalid: "This account can’t be found any more. Remove it and add it again.",
+    error: "It couldn’t be checked just now. It will retry automatically.",
   },
 } as const;
 

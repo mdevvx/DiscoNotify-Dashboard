@@ -29,7 +29,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
 
 // ---------- Layout bits ----------
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-xl border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition-colors duration-150", className)} {...props} />;
+  return <div className={cn("rounded-xl border border-border bg-surface", className)} {...props} />;
 }
 
 export function PageHeader({ title, description, action, icon }: { title: string; description?: string; action?: React.ReactNode; icon?: React.ReactNode }) {
@@ -112,18 +112,18 @@ export function GuildIcon({ name, icon, size = 40, round = false, className }: {
 
 // ---------- Form controls ----------
 export const fieldClass =
-  "min-h-9 w-full rounded-md border border-border bg-surface px-3 text-sm text-text placeholder:text-text-muted/70 disabled:opacity-60 max-sm:min-h-11";
+  "h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-text transition-colors placeholder:text-text-muted/70 hover:border-text-muted/40 focus-visible:border-brand focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-brand/40 disabled:opacity-60 max-sm:h-11";
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...p }, ref) {
   return <input ref={ref} className={cn(fieldClass, className)} {...p} />;
 });
 
 export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(function Select({ className, ...p }, ref) {
-  return <select ref={ref} className={cn(fieldClass, "pr-8", className)} {...p} />;
+  return <select ref={ref} className={cn(fieldClass, "field-select pr-9", className)} {...p} />;
 });
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea({ className, ...p }, ref) {
-  return <textarea ref={ref} className={cn(fieldClass, "min-h-24 py-2", className)} {...p} />;
+  return <textarea ref={ref} className={cn(fieldClass, "h-auto min-h-24 py-2", className)} {...p} />;
 });
 
 export function Field({ label, hint, error, htmlFor, children }: { label: string; hint?: string; error?: string | null; htmlFor: string; children: React.ReactNode }) {

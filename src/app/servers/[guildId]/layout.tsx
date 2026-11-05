@@ -21,8 +21,6 @@ export default async function GuildLayout({ children, params }: { children: Reac
       current={{ id: current.id, name: current.name, icon: current.icon, botPresent: current.botPresent }}
       planLabel={planLabel(current.plan)}
       user={{ name: ctx.user.global_name || ctx.user.username, avatar: avatarUrl(ctx.user.id, ctx.user.avatar) }}
-      siteUrl={env.SITE_URL}
-      supportEmail={env.SUPPORT_EMAIL}
       price={env.BILLING_PRICE_USD}
     >
       {current.botPresent ? children : <InviteCard guildId={guildId} guildName={current.name} href={inviteUrl(guildId)} />}

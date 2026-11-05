@@ -101,7 +101,7 @@ export function AddAccountDialog({
               {platforms.map((p) => (
                 <option key={p.key} value={p.key}>
                   {p.name}
-                  {slotFull(p.key) ? " — free slot used" : ""}
+                  {slotFull(p.key) ? " (free slot used)" : ""}
                 </option>
               ))}
             </Select>
@@ -126,7 +126,7 @@ export function AddAccountDialog({
                 <option key={c.id} value={c.id} disabled={!c.bot_can_send}>
                   #{c.name}
                   {c.category ? ` (${c.category})` : ""}
-                  {!c.bot_can_send ? " — I can’t post here" : ""}
+                  {!c.bot_can_send ? " (I can’t post here)" : ""}
                 </option>
               ))}
             </Select>

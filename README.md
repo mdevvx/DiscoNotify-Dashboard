@@ -80,7 +80,7 @@ Whitelisted servers behave like Premium and never pay. There is no trial.
 - Accounts: tab counters ("1 / 1" on Free), and in the Add dialog a platform that reached its limit is disabled with "upgrade to add more".
 - The bot is the authority: if a request slips through, it answers `free_limit` and the dashboard shows the message and an Upgrade button.
 - A server that drops from Paid to Free **keeps** its accounts. The oldest account of each platform keeps working; the others show
-  **"Paused — free plan"**, stay fully editable, and resume when the server pays again. Nothing is deleted.
+  **"Paused (free plan)"**, stay fully editable, and resume when the server pays again. Nothing is deleted.
 
 ### Pages
 
@@ -96,13 +96,14 @@ Whitelisted servers behave like Premium and never pay. There is no trial.
 | `/servers/[id]/billing` | Plan state, subscribe / manage billing / crypto, payment history, FAQ |
 | `/servers/[id]/billing/thanks` | Payment result page (asks Polar, never trusts the URL) |
 | `/billing` | Server picker for billing |
-| `/account` | Who you are, theme, log out, privacy |
 
 A server where the bot is not present only shows an **Add DiscoNotify** card, then continues by itself when the bot joins
 (polls every 3 s for 2 minutes).
 
-Also: dark/light/system theme with no flash, a Ctrl/Cmd+K command palette, toasts for saves, skeleton loading screens that mirror the
-real layout, error pages with a reference code, mobile layout (sidebar becomes a drawer, rows become cards).
+Also: a light/dark toggle and a Log out button (with confirmation) in every header, theme-aware form fields, calendar and scrollbars,
+a Ctrl/Cmd+K command palette, toasts for saves, route-matched skeleton screens, lazily loaded dialogs, error pages with a reference code,
+and a mobile layout (sidebar becomes a drawer, rows become cards). All buttons share one height. Navigation never reloads the page,
+except when leaving for Discord or Polar.
 
 ---
 
@@ -124,7 +125,9 @@ The browser never talks to Supabase or any payment provider. It only calls this 
 3. The session is an encrypted `HttpOnly; Secure; SameSite=Lax` cookie (7 days) holding only the user and the Discord tokens.
 4. The server list is re-read from Discord when older than 10 minutes,
    so someone who loses Manage Server loses access within 10 minutes. The Refresh button is limited to once per 30 s.
-5. Log out clears the cookie and revokes the Discord token.
+5. Log out (after a confirmation) clears the cookie and revokes the Discord token.
+6. If Discord reports the one-time login code as already used (a scanner or a browser warning page replayed the step), the callback
+   restarts the login once automatically instead of showing an error.
 
 ### Authorization (every request)
 

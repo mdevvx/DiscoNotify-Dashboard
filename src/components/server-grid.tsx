@@ -21,7 +21,7 @@ export interface ServerCard {
 function ServerTile({ s, suffix, cta }: { s: ServerCard; suffix: string; cta: string }) {
   return (
     <li>
-      <div className="group relative flex h-full flex-col items-center overflow-hidden rounded-2xl border border-border bg-surface p-5 text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-popover">
+      <div className="group relative flex h-full flex-col items-center overflow-hidden rounded-2xl border border-border bg-surface p-5 text-center transition duration-200 ease-out hover:-translate-y-0.5 hover:border-brand/50">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-b from-primary/10 to-transparent opacity-70 transition-opacity group-hover:opacity-100" />
         <GuildIcon name={s.name} icon={s.icon} size={76} round className="relative ring-2 ring-border transition group-hover:ring-brand/60" />
         <p className="relative mt-3.5 w-full truncate text-[15px] font-semibold" title={s.name}>

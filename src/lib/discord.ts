@@ -80,8 +80,18 @@ export class DiscordError extends Error {
   }
 }
 
-export const exchangeCode = (code: string) =>
-  tokenRequest({ grant_type: "authorization_code", code, redirect_uri: redirectUri() });
+// A login code works exactly once. If the callback URL is requested twice (double click, reload, host retry), the second request
+// reuses the first exchange instead of failing with invalid_grant.
+const exchanges = new Map<string, Promise<DiscordTokens>>();
+export function exchangeCode(code: string): Promise<DiscordTokens> {
+  const existing = exchanges.get(code);
+  if (existing) return existing;
+  const p = tokenRequest({ grant_type: "authorization_code", code, redirect_uri: redirectUri() });
+  exchanges.set(code, p);
+  p.catch(() => exchanges.delete(code));
+  setTimeout(() => exchanges.delete(code), 60_000).unref?.();
+  return p;
+}
 
 export const refreshTokens = (refreshToken: string) =>
   tokenRequest({ grant_type: "refresh_token", refresh_token: refreshToken });

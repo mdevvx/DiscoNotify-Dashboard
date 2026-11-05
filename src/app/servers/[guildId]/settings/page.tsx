@@ -24,14 +24,14 @@ export default async function SettingsPage({ params }: { params: Promise<{ guild
         <Card className="p-5">
           <h2 className="mb-3 font-semibold">Server details</h2>
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div><dt className="text-text-muted">Name</dt><dd className="truncate font-medium">{ctx.guildRow?.name ?? "—"}</dd></div>
+            <div><dt className="text-text-muted">Name</dt><dd className="truncate font-medium">{ctx.guildRow?.name ?? "-"}</dd></div>
             <div>
               <dt className="text-text-muted">Server ID</dt>
               <dd className="flex items-center gap-1 font-mono">{guildId}<CopyButton value={guildId} label="Copy server ID" /></dd>
             </div>
             <div>
               <dt className="text-text-muted">Owner ID</dt>
-              <dd className="flex items-center gap-1 font-mono">{ctx.guildRow?.owner_id ?? "—"}{ctx.guildRow?.owner_id && <CopyButton value={ctx.guildRow.owner_id} label="Copy owner ID" />}</dd>
+              <dd className="flex items-center gap-1 font-mono">{ctx.guildRow?.owner_id ?? "-"}{ctx.guildRow?.owner_id && <CopyButton value={ctx.guildRow.owner_id} label="Copy owner ID" />}</dd>
             </div>
             <div><dt className="text-text-muted">Bot added</dt><dd>{formatDate(ctx.guildRow?.created_at)}</dd></div>
           </dl>

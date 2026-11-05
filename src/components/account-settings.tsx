@@ -93,7 +93,7 @@ export function AccountSettings({
             <Select aria-label="Alert type for the test" value={testType} onChange={(e) => setTestType(e.target.value)} className="w-auto">
               {configs.map((c) => <option key={c.event_type} value={c.event_type}>{EVENT_LABELS[c.event_type] ?? c.event_type}</option>)}
             </Select>
-            <Button loading={busy === "test"} onClick={() => run("test", () => api(`${base}/test`, "POST", { event_type: testType || undefined }), "Test alert sent — nobody was pinged.")}>
+            <Button loading={busy === "test"} onClick={() => run("test", () => api(`${base}/test`, "POST", { event_type: testType || undefined }), "Test alert sent, nobody was pinged.")}>
               <Send className="size-4" aria-hidden="true" /> Send test alert
             </Button>
             <Button loading={busy === "toggle"} onClick={async () => {
@@ -173,7 +173,7 @@ export function AccountSettings({
       <Card className="p-4">
         <h2 className="mb-3 font-semibold">What an alert looks like</h2>
         <DiscordPreview platform={account.platform} message={configs[0]?.custom_message ?? null} embed={configs.some((c) => c.embed_enabled)} />
-        <p className="mt-2 text-xs text-text-muted">Sample values — real alerts use the creator’s actual title and link. {PLATFORM_META[account.platform]?.name} accent colour shown on the embed.</p>
+        <p className="mt-2 text-xs text-text-muted">Sample values. Real alerts use the creator’s actual title and link. {PLATFORM_META[account.platform]?.name} accent colour shown on the embed.</p>
       </Card>
 
       <Dialog open={removing} onOpenChange={setRemoving} title={`Remove ${account.username}?`} description="This also deletes its alert settings and history. This can’t be undone.">
@@ -198,12 +198,12 @@ function ChannelPicker({ info, current, currentName, valid, busy, onSave }: { in
   const [value, setValue] = useState(current ?? "");
   return (
     <div className="mt-3 space-y-2">
-      {currentName && !valid && <p role="alert" className="text-sm text-danger">The bot lost access to #{currentName} — pick another one.</p>}
+      {currentName && !valid && <p role="alert" className="text-sm text-danger">The bot lost access to #{currentName}. Pick another one.</p>}
       <div className="flex flex-wrap items-center gap-2">
         <Select aria-label="Alert channel" value={value} onChange={(e) => setValue(e.target.value)} className="max-w-sm">
           <option value="">Select a channel…</option>
           {info.channels.map((c) => (
-            <option key={c.id} value={c.id} disabled={!c.bot_can_send}>#{c.name}{!c.bot_can_send ? " — I can’t post here" : ""}</option>
+            <option key={c.id} value={c.id} disabled={!c.bot_can_send}>#{c.name}{!c.bot_can_send ? " (I can’t post here)" : ""}</option>
           ))}
         </Select>
         <Button variant="primary" loading={busy} disabled={!value || value === current} onClick={() => onSave(value)}>Save channel</Button>

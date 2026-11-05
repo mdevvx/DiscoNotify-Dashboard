@@ -43,7 +43,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
     if (a.status === "invalid") attention.push({ key: `i${a.id}`, text: `${name}: ${M.statusHelp.invalid}`, href, tone: "danger" });
     else if (a.status === "error") attention.push({ key: `e${a.id}`, text: `${name}: ${M.statusHelp.error}`, href, tone: "warning" });
     const ch = channels.get(a.id);
-    if (ch && !ch.is_valid) attention.push({ key: `c${a.id}`, text: `${name}: the bot lost access to #${ch.name ?? "the channel"} — pick another one.`, href, tone: "danger" });
+    if (ch && !ch.is_valid) attention.push({ key: `c${a.id}`, text: `${name}: the bot lost access to #${ch.name ?? "the channel"}. Pick another one.`, href, tone: "danger" });
     if (paused.has(a.id)) attention.push({ key: `p${a.id}`, text: `${name} is paused by the free plan.`, href: `/servers/${guildId}/billing`, tone: "warning" });
   }
   if (ctx.plan?.card_status === "past_due") {

@@ -1,3 +1,4 @@
+import { linkButtonClass } from "@/lib/button-styles";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,7 +44,7 @@ export default async function AccountPage({ params }: { params: Promise<{ guildI
 
   return (
     <>
-      <Link href={`/servers/${guildId}/accounts`} className="mb-4 inline-flex min-h-9 items-center gap-1 text-sm text-text-muted hover:text-text">
+      <Link href={`/servers/${guildId}/accounts`} className={`${linkButtonClass("ghost")} -ml-2 mb-3 gap-1`}>
         <ChevronLeft className="size-4" aria-hidden="true" /> Accounts
       </Link>
       <AccountSettings

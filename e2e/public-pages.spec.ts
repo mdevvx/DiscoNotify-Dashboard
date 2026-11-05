@@ -18,7 +18,7 @@ for (const scheme of SCHEMES) {
         page.on("pageerror", (e) => problems.push(e.message));
 
         await page.goto("/login");
-        await expect(page.getByRole("heading", { name: /Never miss a drop/ })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Log in", level: 2 })).toBeVisible();
         await expect(page.getByRole("link", { name: "Continue with Discord" })).toBeVisible();
 
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

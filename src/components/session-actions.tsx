@@ -6,16 +6,19 @@ import { LogOut, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
-import { Button } from "@/components/ui";
+import { Button, Dialog } from "@/components/ui";
 
-/** Logs out and moves to /login with client-side navigation (no full page reload). */
-export function LogoutButton({ variant = "icon", className }: { variant?: "icon" | "button"; className?: string }) {
+/** Simple "Log out" button. Asks for confirmation first, then moves to /login without a page reload. */
+export function LogoutButton({ className }: { className?: string }) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+
   async function go() {
     setBusy(true);
     try {
       await api("/api/auth/logout", "POST");
+      setOpen(false);
       router.replace("/login");
       router.refresh();
     } catch {
@@ -23,27 +26,20 @@ export function LogoutButton({ variant = "icon", className }: { variant?: "icon"
       setBusy(false);
     }
   }
-  if (variant === "button") {
-    return (
-      <Button onClick={go} loading={busy} className={className}>
-        <LogOut className="size-4" aria-hidden="true" /> Log out
-      </Button>
-    );
-  }
+
   return (
-    <button
-      type="button"
-      onClick={go}
-      disabled={busy}
-      aria-label="Log out"
-      title="Log out"
-      className={cn(
-        "inline-flex size-9 items-center justify-center rounded-md text-text-muted hover:bg-surface-raised hover:text-text disabled:opacity-50 max-sm:size-11",
-        className,
-      )}
-    >
-      <LogOut className="size-4" aria-hidden="true" />
-    </button>
+    <>
+      <Button onClick={() => setOpen(true)} className={className}>
+        <LogOut className="size-4" aria-hidden="true" />
+        <span className="max-sm:sr-only">Log out</span>
+      </Button>
+      <Dialog open={open} onOpenChange={(o) => !busy && setOpen(o)} title="Log out?" description="You’ll need to log in with Discord again to manage your servers.">
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>Stay logged in</Button>
+          <Button variant="primary" loading={busy} onClick={go}>Log out</Button>
+        </div>
+      </Dialog>
+    </>
   );
 }
 

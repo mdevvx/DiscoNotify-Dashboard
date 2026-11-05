@@ -3,11 +3,11 @@ const df = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
 const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 const nf = new Intl.NumberFormat("en");
 
-export const formatDateTime = (iso: string | null | undefined) => (iso ? dtf.format(new Date(iso)) : "—");
-export const formatDate = (iso: string | null | undefined) => (iso ? df.format(new Date(iso)) : "—");
+export const formatDateTime = (iso: string | null | undefined) => (iso ? dtf.format(new Date(iso)) : "-");
+export const formatDate = (iso: string | null | undefined) => (iso ? df.format(new Date(iso)) : "-");
 export const formatNumber = (n: number) => nf.format(n);
 export const formatUsd = (n: number | string | null | undefined) =>
-  n === null || n === undefined ? "—" : new Intl.NumberFormat("en", { style: "currency", currency: "USD" }).format(Number(n));
+  n === null || n === undefined ? "-" : new Intl.NumberFormat("en", { style: "currency", currency: "USD" }).format(Number(n));
 
 export function relativeTime(iso: string | null | undefined, now = Date.now()): string {
   if (!iso) return "never";

@@ -10,9 +10,12 @@ import { api, ApiError } from "@/lib/client-api";
 import { cn } from "@/lib/cn";
 import { M, PLATFORM_META } from "@/lib/messages";
 import { PLATFORM_KEYS } from "@/lib/plans";
-import { AddAccountDialog } from "@/components/add-account-dialog";
+import dynamic from "next/dynamic";
 import { RelativeTime } from "@/components/relative-time";
 import { Badge, Banner, Button, Card, Dialog, EmptyState, PlatformBadge } from "@/components/ui";
+
+// The add dialog (and its bot lookups) is only fetched when someone opens it.
+const AddAccountDialog = dynamic(() => import("@/components/add-account-dialog").then((m) => m.AddAccountDialog), { ssr: false });
 
 export interface AccountView {
   id: string;
@@ -59,7 +62,12 @@ export function AccountsView({
 }) {
   const router = useRouter();
   const [filter, setFilter] = useState<string>("all");
-  const [adding, setAdding] = useState(false);
+  const [adding, setAddingState] = useState(false);
+  const [addedOnce, setAddedOnce] = useState(false);
+  const setAdding = (o: boolean) => {
+    if (o) setAddedOnce(true);
+    setAddingState(o);
+  };
   const [removing, setRemoving] = useState<AccountView | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -166,7 +174,7 @@ export function AccountsView({
                     <div className="min-w-0">
                       <dt className="text-xs">Channel</dt>
                       <dd className={cn("truncate", !a.channelValid && a.channelName && "text-danger")} title={a.channelName ?? undefined}>
-                        {a.channelName ? `#${a.channelName}${a.channelValid ? "" : " (no access)"}` : "—"}
+                        {a.channelName ? `#${a.channelName}${a.channelValid ? "" : " (no access)"}` : "-"}
                       </dd>
                     </div>
                     <div>
@@ -175,7 +183,7 @@ export function AccountsView({
                     </div>
                     <div>
                       <dt className="text-xs">Mention</dt>
-                      <dd>{a.mention === "everyone" ? "@everyone" : a.mention === "role" ? "@Role" : "—"}</dd>
+                      <dd>{a.mention === "everyone" ? "@everyone" : a.mention === "role" ? "@Role" : "-"}</dd>
                     </div>
                     <div>
                       <dt className="text-xs">Last checked</dt>
@@ -194,6 +202,7 @@ export function AccountsView({
         )}
       </Card>
 
+      {(adding || addedOnce) && (
       <AddAccountDialog
         guildId={guildId}
         open={adding}
@@ -203,6 +212,7 @@ export function AccountsView({
         unlimited={unlimited}
         initialPlatform={filter !== "all" ? filter : undefined}
       />
+      )}
 
       <Dialog open={Boolean(removing)} onOpenChange={(o) => !o && setRemoving(null)} title={`Remove ${removing?.username ?? "account"}?`} description="This also deletes its alert settings and history. This can’t be undone.">
         <div className="flex justify-end gap-2">
@@ -222,7 +232,7 @@ function Chip({ active, onClick, label, count }: { active: boolean; onClick: () 
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border px-3 text-sm max-sm:min-h-11",
+        "inline-flex h-10 items-center gap-1.5 rounded-full border border-border px-3.5 text-sm max-sm:h-11",
         active ? "bg-surface-raised font-medium text-text" : "text-text-muted hover:bg-surface-raised",
       )}
     >

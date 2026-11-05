@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Activity, ChevronsUpDown, CreditCard, ExternalLink, LayoutDashboard, Menu, Search, Settings, Sparkles, UserCircle, Users, X, type LucideIcon } from "lucide-react";
+import { Activity, ChevronsUpDown, CreditCard, ExternalLink, LayoutDashboard, Menu, Search, Settings, Sparkles, Users, X, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Badge, Button, Dialog, GuildIcon } from "@/components/ui";
+import { linkButtonClass } from "@/lib/button-styles";
 import { Logo } from "@/components/logo";
 import { LogoutButton } from "@/components/session-actions";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -24,8 +25,6 @@ export interface ShellProps {
   current: ShellGuild;
   planLabel: "Free" | "Premium" | "Whitelisted";
   user: { name: string; avatar: string | null };
-  siteUrl: string;
-  supportEmail: string;
   price: string;
   children: React.ReactNode;
 }
@@ -157,7 +156,7 @@ function CommandPalette({ guilds, current }: Pick<ShellProps, "guilds" | "curren
   };
   return (
     <>
-      <Button variant="secondary" size="sm" onClick={() => setOpen(true)} aria-label="Search (Ctrl+K)" className="gap-2 text-text-muted">
+      <Button variant="secondary" onClick={() => setOpen(true)} aria-label="Search (Ctrl+K)" className="gap-2 text-text-muted">
         <Search className="size-4" aria-hidden="true" />
         <span className="hidden sm:inline">Search</span>
         <kbd className="hidden rounded-sm border border-border px-1 text-[11px] sm:inline">Ctrl K</kbd>
@@ -191,7 +190,7 @@ function CommandPalette({ guilds, current }: Pick<ShellProps, "guilds" | "curren
   );
 }
 
-export function ServerShell({ guilds, current, planLabel, user, siteUrl, price, children }: ShellProps) {
+export function ServerShell({ guilds, current, planLabel, user, price, children }: ShellProps) {
   const [drawer, setDrawer] = React.useState(false);
   const pathname = usePathname();
   const base = `/servers/${current.id}`;
@@ -220,16 +219,12 @@ export function ServerShell({ guilds, current, planLabel, user, siteUrl, price, 
               <Sparkles className="size-3" aria-hidden="true" /> Premium
             </p>
             <p className="relative mt-1 font-semibold">Raise every limit.</p>
-            <p className="relative text-xs text-text-muted">${price}/month per server — see plans</p>
+            <p className="relative text-xs text-text-muted">${price}/month per server. See plans</p>
           </Link>
         )}
-        <div className="flex items-center gap-2.5 rounded-xl border border-border bg-surface-raised/40 p-2">
-          <GuildIcon name={user.name} icon={user.avatar} size={34} round />
+        <div className="flex items-center gap-2.5 rounded-xl border border-border p-2.5">
+          <GuildIcon name={user.name} icon={user.avatar} size={32} round />
           <p className="min-w-0 flex-1 truncate text-sm font-medium" title={user.name}>{user.name}</p>
-          <Link href="/account" onClick={onNavigate} aria-label="Account" title="Account" className="inline-flex size-9 items-center justify-center rounded-md text-text-muted hover:bg-surface-raised hover:text-text max-sm:size-11">
-            <UserCircle className="size-4" aria-hidden="true" />
-          </Link>
-          <LogoutButton />
         </div>
       </div>
     </div>
@@ -255,39 +250,29 @@ export function ServerShell({ guilds, current, planLabel, user, siteUrl, price, 
       </DialogPrimitive.Root>
 
       <div className="lg:pl-64">
-        <header className="glass sticky top-0 z-30 flex min-h-14 items-center gap-3 border-b border-border px-4 pt-[env(safe-area-inset-top)] sm:px-6">
+        <header className="glass sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border px-4 pt-[env(safe-area-inset-top)] sm:px-6">
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu" onClick={() => setDrawer(true)}>
             <Menu className="size-5" />
           </Button>
           <p className="truncate text-base font-semibold">{title}</p>
           <Badge tone={planLabel === "Free" ? "neutral" : "brand"} className="hidden sm:inline-flex">{planLabel}</Badge>
           <div className="ml-auto flex items-center gap-2">
+            <CommandPalette guilds={guilds} current={current} />
             {planLabel === "Free" && (
-              <Link
-                href={`${base}/billing`}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-linear-to-r from-primary to-primary-hover px-3 text-sm font-semibold text-primary-foreground shadow-[0_6px_18px_-8px_var(--brand)] transition-[filter] hover:brightness-110 max-sm:min-h-11"
-              >
+              <Link href={`${base}/billing`} className={cn(linkButtonClass("primary"), "gap-1.5")}>
                 <Sparkles className="size-4" aria-hidden="true" /> Premium
               </Link>
             )}
-            <CommandPalette guilds={guilds} current={current} />
-            <div className="hidden w-28 md:block"><ThemeToggle /></div>
             <a
               href={`https://discord.com/channels/${current.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden min-h-9 items-center gap-1.5 rounded-md px-2.5 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text xl:inline-flex"
+              className={cn(linkButtonClass("ghost"), "hidden xl:inline-flex")}
             >
               Open in Discord <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
-            <a
-              href={`${siteUrl}/docs`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden min-h-9 items-center gap-1.5 rounded-md px-2.5 text-sm text-text-muted transition-colors hover:bg-surface-raised hover:text-text sm:inline-flex"
-            >
-              Documentation <ExternalLink className="size-3.5" aria-hidden="true" />
-            </a>
+            <ThemeToggle />
+            <LogoutButton />
           </div>
         </header>
         <main id="main" className="mx-auto w-full max-w-275 px-4 py-8 sm:px-6 sm:py-10">
