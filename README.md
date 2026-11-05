@@ -213,7 +213,7 @@ e2e/                           Playwright tests
 
 Design tokens (colours, radius, shadow) are CSS variables in `src/app/globals.css`; components use semantic names such as
 `bg-surface`, `text-text-muted`, `bg-primary`. The logo is `public/logo.svg` / `src/app/icon.svg` / `src/components/logo.tsx`.
-The logo is the website's own artwork (red `#e23748`, white). Accents use that exact red; buttons use a slightly deeper `#c8283b` because white text on `#e23748` is 4.3:1, below the AA minimum of 4.5:1.
+The logo is the website's own artwork with the brand colours red `#CE495A` and white `#EEF0F7`. Accents use that exact red; buttons use a 10% deeper `#B94251` because `#EEF0F7` on `#CE495A` is 3.9:1, below the AA minimum of 4.5:1 (the deeper shade is 4.66:1).
 
 ---
 

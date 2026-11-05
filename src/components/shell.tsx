@@ -265,7 +265,7 @@ export function ServerShell({ guilds, current, planLabel, user, siteUrl, price, 
             {planLabel === "Free" && (
               <Link
                 href={`${base}/billing`}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-linear-to-r from-brand to-primary px-3 text-sm font-semibold text-white shadow-[0_6px_18px_-8px_var(--brand)] transition-[filter] hover:brightness-110 max-sm:min-h-11"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-linear-to-r from-primary to-primary-hover px-3 text-sm font-semibold text-primary-foreground shadow-[0_6px_18px_-8px_var(--brand)] transition-[filter] hover:brightness-110 max-sm:min-h-11"
               >
                 <Sparkles className="size-4" aria-hidden="true" /> Premium
               </Link>

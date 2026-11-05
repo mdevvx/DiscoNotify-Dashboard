@@ -23,7 +23,7 @@ export function DiscordPreview({ platform, message, embed }: { platform: string;
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-2 text-sm">
             <span className="font-semibold">DiscoNotify</span>
-            <span className="rounded-sm bg-brand px-1 text-[10px] font-semibold uppercase text-white">Bot</span>
+            <span className="rounded-sm bg-primary px-1 text-[10px] font-semibold uppercase text-primary-foreground">Bot</span>
             <span className="text-xs text-text-muted">Today</span>
           </p>
           <p className="mt-0.5 whitespace-pre-wrap break-words text-sm">{text}</p>
