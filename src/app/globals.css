@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* One source of truth for colour. Components use semantic tokens only. */
+:root {
+  --background: #f6f6f8;
+  --surface: #ffffff;
+  --surface-raised: #f0f0f3;
+  --border: #dcdce2;
+  --text: #17171c;
+  --text-muted: #55555f;
+  --primary: #c8283b;
+  --primary-hover: #b02033;
+  --primary-foreground: #ffffff;
+  --primary-text: #b3202f;
+  --brand: #e2364a;
+  --success: #15803d;
+  --warning: #92590a;
+  --danger: #b91c1c;
+  --info: #1d4ed8;
+  --ring: #1d4ed8;
+  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.12);
+
+  --platform-youtube: #ff0000;
+  --platform-twitch: #9146ff;
+  --platform-kick: #53fc18;
+  --platform-instagram: #e4405f;
+  --platform-twitter: #111111;
+  --platform-tiktok: #25f4ee;
+}
+
+.dark {
+  --background: #0b0b0e;
+  --surface: #131318;
+  --surface-raised: #1b1b22;
+  --border: #2b2b35;
+  --text: #ececf1;
+  --text-muted: #a3a3b0;
+  --primary: #c8283b;
+  --primary-hover: #d9304a;
+  --primary-foreground: #ffffff;
+  --primary-text: #ff7083;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #7aa7ff;
+  --ring: #7aa7ff;
+  --shadow-popover: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-text: var(--primary-text);
+  --color-brand: var(--brand);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-ring: var(--ring);
+  --color-youtube: var(--platform-youtube);
+  --color-twitch: var(--platform-twitch);
+  --color-kick: var(--platform-kick);
+  --color-instagram: var(--platform-instagram);
+  --color-twitter: var(--platform-twitter);
+  --color-tiktok: var(--platform-tiktok);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-popover: var(--shadow-popover);
+}
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.skeleton {
+  animation: skeleton 1.6s ease-in-out infinite;
+  background: var(--surface-raised);
+  border-radius: 8px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-in { animation: fade-in 180ms ease-out; }

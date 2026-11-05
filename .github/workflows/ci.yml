@@ -1,0 +1,33 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      APP_URL: http://localhost:3457
+      SITE_URL: https://disconotify.com
+      SESSION_SECRET: ci-secret-ci-secret-ci-secret-1234567890
+      DISCORD_CLIENT_ID: "123456789012345678"
+      DISCORD_CLIENT_SECRET: dummysecretdummy
+      SUPABASE_URL: https://example.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: dummy-service-role-key-dummy-1234
+      POLAR_WEB_TOKEN: dummy-token
+      POLAR_PRODUCT_ID: dummy-product
+      POLAR_SANDBOX: "true"
+      DN_SKIP_PREFLIGHT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npx tsc --noEmit
+      - run: npx eslint .
+      - run: npx vitest run
+      - run: npm run build
+      - name: No server secret in the client bundle
+        run: |
+          ! grep -rE "dummy-service-role-key|dummysecretdummy|dummy-token|ci-secret-ci-secret" .next/static
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
