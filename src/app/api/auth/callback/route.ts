@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getEnv } from "@/lib/env";
 import { applyTokens, exchangeCode, fetchManageableGuilds, fetchMe, redirectUri } from "@/lib/discord";
-import { primeGuilds } from "@/lib/guild-cache";
+import { primeGuilds, rememberGuilds } from "@/lib/guild-cache";
 import { getSession, safeNext } from "@/lib/session";
 
 export async function GET(req: NextRequest) {
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     const session = await getSession();
     session.user = { id: me.id, username: me.username, global_name: me.global_name, avatar: me.avatar };
     primeGuilds(me.id, guilds);
+    rememberGuilds(session, guilds);
     applyTokens(session, tokens);
     await session.save();
     const res = NextResponse.redirect(`${appUrl}${safeNext(req.cookies.get("dn_oauth_next")?.value)}`);

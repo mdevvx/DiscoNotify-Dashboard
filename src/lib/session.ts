@@ -24,6 +24,13 @@ export interface SessionData {
   rt?: string;
   /** access token expiry, ms epoch */
   exp?: number;
+  /**
+   * Compact fallback copy of the manageable servers: [id, permissions, isOwner]. No names or icons, so it stays small (about 45 bytes
+   * per server). Used only when Discord can't be reached (rate limited) so a page never fails because of it.
+   */
+  g?: [string, string, 0 | 1][];
+  /** when `g` was read from Discord, ms epoch */
+  gat?: number;
 }
 
 export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;

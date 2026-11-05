@@ -101,7 +101,14 @@ export async function revokeToken(token: string, hint: "access_token" | "refresh
 }
 
 async function bearerGet<T>(path: string, token: string): Promise<T> {
-  const res = await fetch(`${API}${path}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+  const call = () => fetch(`${API}${path}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+  let res = await call();
+  if (res.status === 429) {
+    // Discord rate limits /users/@me/guilds hard. Wait the advised time (capped) and try once more.
+    const wait = Math.min(3, Number(res.headers.get("retry-after")) || 1);
+    await new Promise((r) => setTimeout(r, wait * 1000));
+    res = await call();
+  }
   if (!res.ok) throw new DiscordError(res.status, `discord_${res.status}`);
   return (await res.json()) as T;
 }
