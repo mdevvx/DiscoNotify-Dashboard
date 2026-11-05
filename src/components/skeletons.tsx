@@ -11,7 +11,7 @@ export function HeaderSkeleton({ action = false }: { action?: boolean }) {
           <Skeleton className="h-4 w-72 max-w-[60vw]" />
         </div>
       </div>
-      {action && <Skeleton className="h-10 w-32" />}
+      {action && <Skeleton className="h-11 w-32" />}
     </div>
   );
 }
@@ -27,12 +27,12 @@ export function RowsSkeleton({ rows = 4, className }: { rows?: number; className
               <Skeleton className="h-4 w-28" />
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Skeleton className="h-9" />
-              <Skeleton className="h-9" />
+              <Skeleton className="h-11" />
+              <Skeleton className="h-11" />
             </div>
             <div className="flex gap-2">
-              <Skeleton className="h-10 w-24" />
-              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-11 w-24" />
+              <Skeleton className="h-11 w-20" />
             </div>
           </li>
         ))}

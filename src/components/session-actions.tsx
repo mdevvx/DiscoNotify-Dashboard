@@ -29,14 +29,14 @@ export function LogoutButton({ className }: { className?: string }) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className={className}>
+      <Button size="sm" onClick={() => setOpen(true)} className={className}>
         <LogOut className="size-4" aria-hidden="true" />
         <span className="max-sm:sr-only">Log out</span>
       </Button>
       <Dialog open={open} onOpenChange={(o) => !busy && setOpen(o)} title="Log out?" description="You’ll need to log in with Discord again to manage your servers.">
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>Stay logged in</Button>
-          <Button variant="primary" loading={busy} onClick={go}>Log out</Button>
+          <Button variant="brand" loading={busy} onClick={go}>Log out</Button>
         </div>
       </Dialog>
     </>

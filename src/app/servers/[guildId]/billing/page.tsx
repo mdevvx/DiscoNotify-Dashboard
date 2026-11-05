@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Check, CreditCard, Landmark, Sparkles } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { BillingActions } from "@/components/billing-actions";
-import { Badge, Banner, Card, EmptyState, PageHeader } from "@/components/ui";
+import { PlanCard } from "@/components/plan-card";
+import { Badge, Banner, Button, Card, EmptyState, PageHeader } from "@/components/ui";
 import { getBilling, listAccounts, listPayments } from "@/lib/db";
 import { cryptoEnabled, getEnv } from "@/lib/env";
 import { formatDate, formatUsd } from "@/lib/format";
@@ -12,10 +13,10 @@ import { DEFAULT_FREE_PER_PLATFORM, DEFAULT_MAX_ACCOUNTS, pausedByFreePlan, plan
 export const metadata: Metadata = { title: "Billing" };
 
 const FREE_FEATURES = [
-  `${DEFAULT_FREE_PER_PLATFORM} account per platform`,
-  "YouTube, Twitch, Kick, Instagram, X and TikTok",
-  "Custom messages, mentions and test alerts",
-  "Free forever, nothing to sign up for",
+  `${DEFAULT_FREE_PER_PLATFORM} account per platform: 1 YouTube, 1 Twitch, 1 Kick, 1 Instagram, 1 X, 1 TikTok`,
+  "Alerts, mentions, custom messages and rich cards",
+  "Full dashboard",
+  "Free forever, no card needed",
 ];
 
 export default async function BillingPage({ params }: { params: Promise<{ guildId: string }> }) {
@@ -55,58 +56,28 @@ export default async function BillingPage({ params }: { params: Promise<{ guildI
         )}
 
         {isFree ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="flex flex-col p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Free</h2>
-                <Badge>Your plan</Badge>
-              </div>
-              <p className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-4xl font-bold tracking-tight">$0</span>
-                <span className="text-text-muted">forever</span>
-              </p>
-              <ul className="mt-5 space-y-2.5 text-sm">
-                {FREE_FEATURES.map((t) => (
-                  <li key={t} className="flex items-start gap-2.5">
-                    <Check className="mt-0.5 size-4 shrink-0 text-text-muted" aria-hidden="true" /> {t}
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
-            <Card className="relative flex flex-col overflow-hidden border-brand/50 p-6">
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-transparent" />
-              <div className="relative flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-lg font-semibold">
-                  <Sparkles className="size-4 text-primary-text" aria-hidden="true" /> Premium
-                </h2>
-                <Badge tone="brand">Most popular</Badge>
-              </div>
-              <p className="relative mt-3 flex items-baseline gap-1.5">
-                <span className="text-4xl font-bold tracking-tight tabular-nums">${price}</span>
-                <span className="text-text-muted">per server, per month</span>
-              </p>
-              <ul className="relative mt-5 space-y-2.5 text-sm">
-                {[
-                  `Unlimited accounts per platform (up to ${DEFAULT_MAX_ACCOUNTS} per server)`,
-                  "Everything in Free",
-                  "Cancel any time, extra accounts simply pause",
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2.5">
-                    <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" /> {t}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="relative mt-6 border-t border-border pt-5">
-                <p className="mb-3 text-sm font-medium">Pay your way</p>
-                <ul className="mb-5 grid gap-2 text-sm text-text-muted">
-                  <li className="flex items-center gap-2.5"><CreditCard className="size-4 shrink-0" aria-hidden="true" /> Card: monthly subscription, cancel any time</li>
-                  {crypto && <li className="flex items-center gap-2.5"><Landmark className="size-4 shrink-0" aria-hidden="true" /> Crypto: prepaid 3, 6 or 12 months</li>}
-                </ul>
-                <BillingActions guildId={guildId} state={state} price={price} cryptoEnabled={crypto} links={links} />
-              </div>
-            </Card>
+          <div className="grid gap-6 pt-3 md:grid-cols-2">
+            <PlanCard label="Free" price="0" priceNote="forever" per="per Discord server" features={FREE_FEATURES}>
+              <Button className="w-full" disabled>
+                Your current plan
+              </Button>
+            </PlanCard>
+            <PlanCard
+              label="Premium"
+              price={price}
+              priceNote="/ month"
+              per="per Discord server"
+              badge="Unlimited accounts"
+              highlight
+              features={[
+                `Unlimited accounts per platform (up to ${DEFAULT_MAX_ACCOUNTS} per server)`,
+                "Alerts, mentions, custom messages and rich cards",
+                "Full dashboard",
+                crypto ? "Card (monthly, cancel any time) or crypto (3 / 6 / 12 months prepaid)" : "Card, monthly, cancel any time",
+              ]}
+            >
+              <BillingActions guildId={guildId} state={state} price={price} cryptoEnabled={crypto} links={links} />
+            </PlanCard>
           </div>
         ) : (
           (() => {
@@ -131,7 +102,7 @@ export default async function BillingPage({ params }: { params: Promise<{ guildI
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="text-xs text-text-muted">
+                <thead className="bg-surface-raised font-mono text-[0.7rem] uppercase tracking-[0.12em] text-text-subtle">
                   <tr><th className="p-3 font-medium">Date</th><th className="p-3 font-medium">Method</th><th className="p-3 font-medium">Months</th><th className="p-3 font-medium">Amount</th><th className="p-3 font-medium">Status</th></tr>
                 </thead>
                 <tbody className="divide-y divide-border">

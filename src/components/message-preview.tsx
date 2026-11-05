@@ -26,7 +26,7 @@ export function DiscordPreview({ platform, message, embed }: { platform: string;
             <span className="rounded-sm bg-primary px-1 text-[10px] font-semibold uppercase text-primary-foreground">Bot</span>
             <span className="text-xs text-text-muted">Today</span>
           </p>
-          <p className="mt-0.5 whitespace-pre-wrap break-words text-sm">{text}</p>
+          <p className="mt-0.5 whitespace-pre-wrap wrap-break-word text-sm">{text}</p>
           {embed && (
             <div className="mt-2 max-w-sm overflow-hidden rounded-md border-l-4 bg-surface p-3" style={{ borderLeftColor: ACCENT[platform] ?? "var(--brand)" }}>
               <p className="text-xs text-text-muted">{values.creator} · {values.platform}</p>

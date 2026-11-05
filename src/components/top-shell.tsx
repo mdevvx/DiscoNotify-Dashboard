@@ -14,7 +14,7 @@ export async function TopShell({ children }: { children: React.ReactNode }) {
     <div className="relative isolate min-h-dvh">
       <div aria-hidden="true" className="bg-grid absolute inset-x-0 top-0 -z-10 h-96 opacity-60" />
       <header className="glass sticky top-0 z-30 border-b border-border pt-[env(safe-area-inset-top)]">
-        <div className="mx-auto flex h-16 max-w-310 items-center gap-3 px-4 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-280 items-center gap-3 px-4 sm:px-6">
           <Link href="/servers" aria-label="DiscoNotify, all servers">
             <Logo />
           </Link>
@@ -32,7 +32,7 @@ export async function TopShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main id="main" className="mx-auto w-full max-w-310 px-4 py-10 sm:px-6 sm:py-14">{children}</main>
+      <main id="main" className="mx-auto w-full max-w-280 px-4 py-10 sm:px-6 sm:py-14">{children}</main>
     </div>
   );
 }

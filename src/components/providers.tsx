@@ -18,7 +18,18 @@ export function Providers({ children, nonce }: { children: React.ReactNode; nonc
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange nonce={nonce}>
       <QueryClientProvider client={client}>
         {children}
-        <Toaster position="bottom-right" richColors closeButton theme="system" toastOptions={{ className: "font-sans!" }} />
+        <Toaster
+          position="bottom-right"
+          closeButton
+          theme="system"
+          toastOptions={{
+            classNames: {
+              toast: "font-sans! rounded-xl! border! border-border! bg-surface! text-text! shadow-popover!",
+              description: "text-text-muted!",
+              closeButton: "border-border! bg-surface! text-text-muted!",
+            },
+          }}
+        />
       </QueryClientProvider>
     </ThemeProvider>
   );

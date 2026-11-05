@@ -64,7 +64,7 @@ export function DateField({ value, onChange, label, placeholder }: { value: stri
             type="button"
             aria-label={`${label}${selected ? `: ${fmtShort.format(selected)}` : ""}`}
             className={cn(
-              "flex h-10 w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 text-left text-sm transition-colors hover:border-text-muted/40 focus-visible:border-brand max-sm:h-11",
+              "flex h-11 w-full items-center gap-2 rounded-md border border-border bg-background px-3.5 text-left font-mono text-[0.95rem] transition-colors hover:border-text-subtle/60 focus-visible:border-signal max-sm:h-12",
               !selected && "text-text-muted/80",
             )}
           >
@@ -84,7 +84,7 @@ export function DateField({ value, onChange, label, placeholder }: { value: stri
         )}
       </div>
       <Popover.Portal>
-        <Popover.Content align="start" sideOffset={6} aria-label={`${label} calendar`} className="fade-in z-50 w-72 rounded-xl border border-border bg-surface p-3 shadow-popover">
+        <Popover.Content align="start" sideOffset={6} aria-label={`${label} calendar`} className="fade-in z-50 w-72 rounded-2xl border border-border bg-surface p-3 shadow-popover">
           <div className="mb-2 flex items-center justify-between">
             <button type="button" aria-label="Previous month" onClick={() => setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))} className="inline-flex size-9 items-center justify-center rounded-lg text-text-muted hover:bg-surface-raised hover:text-text">
               <ChevronLeft className="size-4" aria-hidden="true" />

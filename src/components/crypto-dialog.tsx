@@ -142,8 +142,8 @@ export function CryptoDialog({ guildId, open, onOpenChange, price }: { guildId: 
                     aria-checked={on}
                     onClick={() => setMonths(m)}
                     className={cn(
-                      "flex flex-col items-center gap-0.5 rounded-xl border px-2 py-3 text-center transition-colors",
-                      on ? "border-brand bg-primary/10" : "border-border hover:bg-surface-raised",
+                      "flex flex-col items-center gap-0.5 rounded-2xl border px-2 py-3.5 text-center transition-colors",
+                      on ? "border-signal bg-signal-soft ring-[3px] ring-signal/20" : "border-border hover:bg-surface-raised",
                     )}
                   >
                     <span className="text-sm font-semibold">{m} months</span>
@@ -174,8 +174,8 @@ export function CryptoDialog({ guildId, open, onOpenChange, price }: { guildId: 
                       aria-checked={coin === c}
                       onClick={() => setCoin(c)}
                       className={cn(
-                        "flex h-10 items-center justify-between gap-2 rounded-lg border px-3 text-sm transition-colors max-sm:h-11",
-                        coin === c ? "border-brand bg-primary/10 font-medium" : "border-border hover:bg-surface-raised",
+                        "flex h-11 items-center justify-between gap-2 rounded-xl border px-3.5 text-sm transition-colors max-sm:h-12",
+                        coin === c ? "border-signal bg-signal-soft font-medium ring-[3px] ring-signal/20" : "border-border hover:bg-surface-raised",
                       )}
                     >
                       <span className="truncate">{coinLabel(c)}</span>
@@ -203,7 +203,7 @@ export function CryptoDialog({ guildId, open, onOpenChange, price }: { guildId: 
             </p>
           </div>
 
-          <Button variant="primary" className="w-full" loading={busy} disabled={!coin} onClick={create}>
+          <Button variant="brand" className="w-full" loading={busy} disabled={!coin} onClick={create}>
             Create payment{coin ? ` in ${coinLabel(coin)}` : ""}
           </Button>
         </div>

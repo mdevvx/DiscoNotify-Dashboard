@@ -232,7 +232,7 @@ function Chip({ active, onClick, label, count }: { active: boolean; onClick: () 
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        "inline-flex h-10 items-center gap-1.5 rounded-full border border-border px-3.5 text-sm max-sm:h-11",
+        "inline-flex h-10 items-center gap-1.5 rounded-full border border-border px-4 text-sm font-medium max-sm:h-11",
         active ? "bg-surface-raised font-medium text-text" : "text-text-muted hover:bg-surface-raised",
       )}
     >

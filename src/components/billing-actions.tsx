@@ -58,20 +58,20 @@ export function BillingActions({
   const subscribe = state === "free_new" || state === "free_lapsed";
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+      <div className={subscribe || state === "paid_crypto" ? "flex flex-col gap-2.5" : "flex flex-wrap gap-2"}>
         {subscribe && (
-          <Button variant="primary" loading={busy === "checkout"} onClick={checkout}>
+          <Button variant="brand" className="w-full" loading={busy === "checkout"} onClick={checkout}>
             {state === "free_lapsed" ? "Subscribe again" : `Subscribe for $${price}/month`}
           </Button>
         )}
-        {subscribe && cryptoEnabled && <Button onClick={() => setCrypto(true)}>Pay with crypto</Button>}
+        {subscribe && cryptoEnabled && <Button className="w-full" onClick={() => setCrypto(true)}>Pay with crypto</Button>}
         {(state === "paid_card" || state === "paid_card_past_due" || state === "paid_card_cancelling") && (
-          <Button variant={state === "paid_card_past_due" ? "primary" : "secondary"} loading={busy === "portal"} onClick={portal}>
+          <Button variant={state === "paid_card_past_due" ? "brand" : "secondary"} loading={busy === "portal"} onClick={portal}>
             Manage billing
           </Button>
         )}
         {state === "paid_card_cancelling" && <Button disabled title="Available when your current period ends">Resubscribe</Button>}
-        {state === "paid_crypto" && cryptoEnabled && <Button variant="primary" onClick={() => setCrypto(true)}>Add more months</Button>}
+        {state === "paid_crypto" && cryptoEnabled && <Button variant="brand" className="w-full sm:w-auto" onClick={() => setCrypto(true)}>Add more months</Button>}
       </div>
       {state !== "whitelisted" && (
         <p className="text-xs text-text-muted">

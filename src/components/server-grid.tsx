@@ -96,7 +96,7 @@ export function ServerPicker({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search servers"
-              className="min-h-10 w-full rounded-lg border border-border bg-surface pl-9 pr-3 text-sm placeholder:text-text-muted/70 max-sm:min-h-11"
+              className="h-11 w-full rounded-md border border-border bg-background pl-9 pr-3 font-mono text-[0.95rem] placeholder:text-text-subtle focus-visible:border-signal focus-visible:outline-2 focus-visible:outline-signal max-sm:h-12"
             />
           </label>
           {action}

@@ -83,9 +83,9 @@ export function AddAccountDialog({
     <Dialog open={open} onOpenChange={onOpenChange} title="Add an account" description="Alerts are posted when this account uploads, posts or goes live.">
       {!data && !loadError && (
         <div className="space-y-3" aria-busy="true">
-          <Skeleton className="h-9" />
-          <Skeleton className="h-9" />
-          <Skeleton className="h-9" />
+          <Skeleton className="h-11" />
+          <Skeleton className="h-11" />
+          <Skeleton className="h-11" />
         </div>
       )}
       {loadError && (

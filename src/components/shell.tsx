@@ -110,11 +110,11 @@ function NavLinks({ base, onNavigate }: { base: string; onNavigate?: () => void 
                   onClick={onNavigate}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex min-h-10 items-center gap-3 rounded-lg px-2.5 text-sm font-medium text-text-muted transition-colors duration-150 hover:bg-surface-raised hover:text-text max-sm:min-h-11",
-                    active && "bg-primary/12 text-text before:absolute before:-left-3 before:bottom-2 before:top-2 before:w-0.75 before:rounded-full before:bg-brand",
+                    "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-text-muted transition-colors duration-150 hover:bg-surface-raised hover:text-text max-sm:min-h-12",
+                    active && "bg-signal-soft text-primary-text before:absolute before:-left-3 before:bottom-2 before:top-2 before:w-0.75 before:rounded-full before:bg-signal",
                   )}
                 >
-                  <Icon className={cn("size-4", active && "text-primary-text")} aria-hidden="true" />
+                  <Icon className="size-4" aria-hidden="true" />
                   {label}
                 </Link>
               );
@@ -156,7 +156,7 @@ function CommandPalette({ guilds, current }: Pick<ShellProps, "guilds" | "curren
   };
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)} aria-label="Search (Ctrl+K)" className="gap-2 text-text-muted">
+      <Button variant="secondary" size="sm" onClick={() => setOpen(true)} aria-label="Search (Ctrl+K)" className="gap-2 text-text-muted">
         <Search className="size-4" aria-hidden="true" />
         <span className="hidden sm:inline">Search</span>
         <kbd className="hidden rounded-sm border border-border px-1 text-[11px] sm:inline">Ctrl K</kbd>
@@ -259,7 +259,7 @@ export function ServerShell({ guilds, current, planLabel, user, price, children 
           <div className="ml-auto flex items-center gap-2">
             <CommandPalette guilds={guilds} current={current} />
             {planLabel === "Free" && (
-              <Link href={`${base}/billing`} className={cn(linkButtonClass("primary"), "gap-1.5")}>
+              <Link href={`${base}/billing`} className={linkButtonClass("brand", "sm")}>
                 <Sparkles className="size-4" aria-hidden="true" /> Premium
               </Link>
             )}
@@ -267,7 +267,7 @@ export function ServerShell({ guilds, current, planLabel, user, price, children 
               href={`https://discord.com/channels/${current.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(linkButtonClass("ghost"), "hidden xl:inline-flex")}
+              className={cn(linkButtonClass("ghost", "sm"), "hidden xl:inline-flex")}
             >
               Open in Discord <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
@@ -275,7 +275,7 @@ export function ServerShell({ guilds, current, planLabel, user, price, children 
             <LogoutButton />
           </div>
         </header>
-        <main id="main" className="mx-auto w-full max-w-275 px-4 py-8 sm:px-6 sm:py-10">
+        <main id="main" className="mx-auto w-full max-w-280 px-4 py-8 sm:px-6 sm:py-10">
           {children}
         </main>
       </div>

@@ -1,19 +1,27 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 // Plain module (no "use client") so server components can call linkButtonClass().
-// Every button is the same height (40px, 44px on touch screens) so rows of actions line up.
+// Same set as the website: primary (ink), brand (red), ghost (outlined), discord. 8px corners, weight 600.
 export const buttonVariants = cva(
-  "inline-flex h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors duration-150 ease-out disabled:pointer-events-none disabled:opacity-50 max-sm:h-11",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent font-semibold transition-[background-color,border-color,transform,box-shadow] duration-150 ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55",
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:bg-primary-hover",
-        secondary: "border border-border bg-surface text-text hover:bg-surface-raised",
+        primary: "bg-btn-solid text-btn-solid-ink hover:-translate-y-px hover:opacity-90",
+        brand: "bg-primary text-primary-foreground hover:-translate-y-px hover:bg-primary-hover",
+        discord: "bg-discord text-white hover:-translate-y-px hover:bg-discord-hover",
+        // "secondary" is the website's .btn-ghost
+        secondary: "border-border bg-surface text-text hover:bg-surface-raised",
         ghost: "text-text-muted hover:bg-surface-raised hover:text-text",
-        danger: "border border-danger/40 bg-surface text-danger hover:bg-danger/10",
+        danger: "border-border bg-surface text-primary-text hover:bg-signal-soft",
       },
-      // `sm` keeps the same height; it only tightens the padding.
-      size: { md: "", sm: "px-3.5", icon: "w-10 px-0 max-sm:w-11" },
+      // sm: header and table actions. md: default. lg: hero and page-level actions.
+      size: {
+        sm: "h-9.5 px-3.5 text-[0.85rem]",
+        md: "h-11 px-[1.15rem] text-[0.95rem] max-sm:h-12",
+        lg: "h-12 rounded-lg px-[1.35rem] text-base",
+        icon: "size-9.5 px-0 text-[0.85rem]",
+      },
     },
     defaultVariants: { variant: "secondary", size: "md" },
   },

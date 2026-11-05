@@ -121,7 +121,7 @@ export function AccountSettings({
       <Card className="p-4">
         <h2 className="font-semibold">Where alerts go</h2>
         {!data && !loadErr ? (
-          <Skeleton className="mt-3 h-9 max-w-sm" />
+          <Skeleton className="mt-3 h-11 max-w-sm" />
         ) : data ? (
           <ChannelPicker info={data.info} current={channelDiscordId} currentName={channelName} valid={channelValid} busy={busy === "channel"} onSave={async (channelId) => {
             const r = await run("channel", () => api<{ webhook_created: boolean }>(`${base}/channel`, "POST", { channel_id: channelId }), "Saved ✓");
