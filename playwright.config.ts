@@ -10,7 +10,7 @@ export default defineConfig({
   // Runs against a production build. Set the .env.example variables (a dummy database is fine for public pages)
   // plus DN_SKIP_PREFLIGHT=1 when no real database is reachable.
   webServer: {
-    command: `npx next start -p ${PORT}`,
+    command: `pnpm exec next start -p ${PORT}`,
     port: PORT,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
