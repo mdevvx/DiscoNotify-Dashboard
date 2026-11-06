@@ -1,7 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const WIDTHS = [375, 768, 1440] as const;
+const WIDTHS = [320, 375, 768, 1440] as const;
+
+// Screenshot baselines are rendered per operating system (fonts differ), so they are compared locally. On CI they run only when
+// Linux baselines have been generated and E2E_VISUAL=1 is set.
+const compareScreenshots = !process.env.CI || process.env.E2E_VISUAL === "1";
 const SCHEMES = ["light", "dark"] as const;
 
 // Public pages (no Discord login needed). Signed-in pages need a real session + database: see README "Testing".
@@ -24,11 +28,17 @@ for (const scheme of SCHEMES) {
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         expect(overflow).toBeLessThanOrEqual(0);
 
+        // The page hides horizontal overflow, so also make sure no heading, link or button runs past the viewport edge.
+        const clipped = await page.evaluate(() =>
+          [...document.querySelectorAll("h1, h1 span, h2, a, button")].filter((el) => el.getBoundingClientRect().right > window.innerWidth + 0.5).map((el) => el.textContent?.slice(0, 30)),
+        );
+        expect(clipped).toEqual([]);
+
         const axe = await new AxeBuilder({ page }).analyze();
         const bad = axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""));
         expect(bad, JSON.stringify(bad.map((v) => v.id))).toEqual([]);
 
-        await expect(page).toHaveScreenshot(`login-${scheme}-${width}.png`);
+        if (compareScreenshots) await expect(page).toHaveScreenshot(`login-${scheme}-${width}.png`);
         expect(problems).toEqual([]);
       });
     });

@@ -226,7 +226,8 @@ The logo is the website's own artwork with the brand colours red `#CE495A` and w
   permission and mention rules (including 64-bit values), cookie sizing, safe redirects, snowflake guards.
 - **Browser (`pnpm test:e2e`):** login page in light and dark at 375 / 768 / 1440 px with axe accessibility scan, no console
   errors, no horizontal scroll and screenshots; signed-out redirect; cross-site POST refused; security headers.
-  Screenshots are stored per OS (`*-win32.png`); regenerate with `pnpm test:e2e --update-snapshots` on a new OS.
+  Screenshots are stored per OS (`*-win32.png`) and compared locally only. On CI they are skipped unless `E2E_VISUAL=1` is set, which needs
+  baselines generated on that OS with `pnpm test:e2e --update-snapshots`. Layout, overflow, accessibility and console checks always run.
 - **Not covered automatically:** signed-in pages need a real Discord session, database and bot. Use the acceptance checklist in the
   original spec against a staging setup (Polar sandbox).
 

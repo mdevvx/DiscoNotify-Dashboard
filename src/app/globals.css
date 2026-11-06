@@ -278,69 +278,18 @@ select.field-select option { background: var(--surface); color: var(--text); }
 input[type="search"]::-webkit-search-cancel-button { filter: grayscale(1); opacity: 0.6; }
 
 /* ---------- login page: ambient motion (all of it is switched off by prefers-reduced-motion) ---------- */
-@property --angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
 @keyframes drift-a { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(60px, -40px) scale(1.12); } }
 @keyframes drift-b { 0%, 100% { transform: translate(0, 0) scale(1.05); } 50% { transform: translate(-50px, 50px) scale(0.95); } }
-@keyframes shimmer { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@keyframes spin-angle { to { --angle: 360deg; } }
-@keyframes feed-cycle {
-  0% { opacity: 0; transform: translateY(18px) scale(0.97); }
-  6%, 30% { opacity: 1; transform: none; }
-  36%, 100% { opacity: 0; transform: translateY(-14px) scale(0.98); }
-}
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-@keyframes bar-grow { from { width: 8%; } to { width: 100%; } }
 
 .orb { position: absolute; border-radius: 9999px; filter: blur(80px); pointer-events: none; }
 .orb-a { animation: drift-a 18s ease-in-out infinite; }
 .orb-b { animation: drift-b 22s ease-in-out infinite; }
 
-.text-shimmer {
-  background: linear-gradient(110deg, var(--text) 38%, var(--primary-text) 50%, var(--text) 62%);
-  background-size: 260% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 7s linear infinite;
-}
-
-.marquee { mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent); }
-.marquee-track { display: flex; width: max-content; gap: 0.75rem; animation: marquee 32s linear infinite; }
-.marquee:hover .marquee-track { animation-play-state: paused; }
-
-.feed-card { position: absolute; inset: 0 auto auto 0; width: 100%; opacity: 0; animation: feed-cycle 12s ease-out infinite both; }
 .live-dot { animation: blink 1.4s ease-in-out infinite; }
-.feed-bar { animation: bar-grow 4s linear infinite; }
-
-/* a slowly travelling highlight around the login card */
-.glow-border { position: relative; }
-.glow-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: conic-gradient(from var(--angle), transparent 0 62%, var(--brand) 82%, transparent 100%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation: spin-angle 7s linear infinite;
-  pointer-events: none;
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .orb-a, .orb-b, .text-shimmer, .marquee-track, .feed-card, .live-dot, .feed-bar, .glow-border::before { animation: none !important; }
-  .text-shimmer { background-position: 50% 0; }
-  .feed-card { opacity: 1; position: relative; }
-  .feed-card:not(:first-child) { display: none; }
-  .feed-bar { width: 62%; }
-  .glow-border::before { background: var(--border); }
+  .orb-a, .orb-b, .live-dot { animation: none !important; }
 }
 
 
