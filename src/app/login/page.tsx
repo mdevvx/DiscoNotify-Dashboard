@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ArrowRight, BellRing, Check, Gauge, ShieldCheck, SlidersHorizontal } from "lucide-react";
+import { ArrowRight, BellRing, Gauge, SlidersHorizontal } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { linkButtonClass } from "@/lib/button-styles";
 import { cn } from "@/lib/cn";
+import { inviteUrl } from "@/lib/discord";
 import { getEnv } from "@/lib/env";
 import { PLATFORM_META } from "@/lib/messages";
 import { getSession, safeNext } from "@/lib/session";
@@ -19,10 +20,10 @@ const ERRORS: Record<string, string> = {
 
 const PLATFORMS = ["youtube", "twitch", "kick", "instagram", "twitter", "tiktok"] as const;
 
-const POINTS = [
-  { icon: BellRing, title: "Alerts that match your community", text: "Uploads, shorts, posts and live streams, posted in the channel you choose." },
-  { icon: SlidersHorizontal, title: "Everything in one dashboard", text: "Accounts, channels, pings and message text, with no commands to remember." },
-  { icon: Gauge, title: "Free to start", text: "One account per platform is free, forever. Premium removes the limit." },
+const INCLUDED = [
+  { icon: BellRing, label: "Live alerts" },
+  { icon: SlidersHorizontal, label: "Full dashboard" },
+  { icon: Gauge, label: "Free to start" },
 ];
 
 const FEED = [
@@ -31,37 +32,12 @@ const FEED = [
   { platform: "tiktok", creator: "Daily Dev", text: "New post: Tip #42", tag: "POST", live: false, delay: "8s" },
 ] as const;
 
-/** One platform pill. The row is duplicated so the marquee can loop without a visible jump. */
-function PlatformPills({ hidden = false }: { hidden?: boolean }) {
-  return (
-    <ul className="flex shrink-0 gap-3" aria-hidden={hidden || undefined} aria-label={hidden ? undefined : "Supported platforms"}>
-      {PLATFORMS.map((p) => (
-        <li key={p} className="flex items-center gap-2 rounded-full border border-border bg-surface/70 px-4 py-2 text-sm font-medium">
-          <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: PLATFORM_META[p]?.color }} />
-          {PLATFORM_META[p]?.name}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function PlatformMarquee({ className }: { className?: string }) {
-  return (
-    <div className={cn("marquee overflow-hidden", className)}>
-      <div className="marquee-track">
-        <PlatformPills />
-        <PlatformPills hidden />
-      </div>
-    </div>
-  );
-}
-
 /** A looping "live alert" preview: one card at a time slides in, holds, then slides out. Decorative only. */
 function LiveFeed() {
   return (
-    <div aria-hidden="true" className="relative">
-      <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-text-muted">
-        <span className="live-dot size-2 rounded-full bg-success" /> Live alerts
+    <div aria-hidden="true" className="relative max-w-md">
+      <div className="eyebrow mb-3 flex items-center gap-2">
+        <span className="live-dot size-2 rounded-full bg-ok" /> Live alerts
       </div>
       <div className="relative h-28">
         {FEED.map((f) => (
@@ -101,96 +77,102 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const site = getEnv().SITE_URL;
 
   return (
-    <main id="main" className="relative isolate grid min-h-dvh overflow-hidden lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-      {/* ambient background */}
+    <main id="main" className="relative isolate flex min-h-dvh flex-col overflow-hidden">
+      {/* the scene: grid + slowly drifting colour */}
       <div aria-hidden="true" className="bg-grid absolute inset-0 -z-20 opacity-60" />
-      <div aria-hidden="true" className="orb orb-a -left-24 top-1/4 -z-10 size-120 bg-brand/20" />
-      <div aria-hidden="true" className="orb orb-b -right-24 bottom-0 -z-10 size-104 bg-twitch/15" />
+      <div aria-hidden="true" className="orb orb-a -left-24 top-1/4 -z-10 size-120 bg-signal/25" />
+      <div aria-hidden="true" className="orb orb-b -right-20 top-0 -z-10 size-104 bg-twitch/20" />
+      <div aria-hidden="true" className="orb orb-a bottom-0 left-1/3 -z-10 size-96 bg-tiktok/10" />
 
-      {/* Brand side */}
-      <section className="hidden flex-col justify-between gap-12 p-12 lg:flex xl:p-16">
-        <div className="rise">
-          <Logo size={38} className="text-lg" />
-        </div>
+      <header className="rise px-5 pt-7 sm:px-10 lg:px-16">
+        <Logo size={36} />
+      </header>
 
-        <div className="max-w-xl">
-          <h1 className="rise text-4xl font-semibold leading-[1.12] tracking-tight xl:text-5xl" style={{ animationDelay: "80ms" }}>
-            Alerts for <span className="text-shimmer">every creator</span> your community follows.
+      <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-5 py-10 sm:px-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,27rem)] lg:gap-16 lg:px-16">
+        {/* Headline side */}
+        <section>
+          <p className="eyebrow eyebrow-bar rise" style={{ animationDelay: "60ms" }}>
+            Discord alerts for creators
+          </p>
+          <h1 className="rise mt-5 max-w-2xl text-[clamp(2.4rem,5.4vw,4.1rem)] font-extrabold leading-[1.04] tracking-[-0.035em]" style={{ animationDelay: "120ms" }}>
+            Alerts for <span className="text-shimmer whitespace-nowrap">every creator</span> your community follows.
           </h1>
-          <ul className="mt-10 space-y-6">
-            {POINTS.map(({ icon: Icon, title, text }, i) => (
-              <li key={title} className="rise flex gap-4" style={{ animationDelay: `${200 + i * 110}ms` }}>
-                <span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary-text ring-1 ring-primary/20">
-                  <Icon className="size-5" />
-                </span>
-                <div>
-                  <p className="font-medium">{title}</p>
-                  <p className="mt-0.5 text-sm text-text-muted">{text}</p>
-                </div>
+          <p className="rise mt-5 max-w-lg text-lg text-text-muted" style={{ animationDelay: "200ms" }}>
+            Pick the channel, choose who gets pinged and write your own message. Everything is set up here in a minute, no commands needed.
+          </p>
+
+          <ul className="rise mt-7 flex flex-wrap gap-2.5" style={{ animationDelay: "280ms" }} aria-label="Supported platforms">
+            {PLATFORMS.map((p) => (
+              <li key={p} className="flex items-center gap-2 rounded-full border border-border bg-surface/60 px-4 py-2 text-sm font-semibold backdrop-blur-md">
+                <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: PLATFORM_META[p]?.color }} />
+                {PLATFORM_META[p]?.name}
               </li>
             ))}
           </ul>
-        </div>
 
-        <div className="rise max-w-xl space-y-6" style={{ animationDelay: "560ms" }}>
-          <LiveFeed />
-          <PlatformMarquee />
-        </div>
-      </section>
-
-      {/* Form side */}
-      <section className="flex flex-col px-5 py-8 sm:px-10">
-        <div className="lg:hidden">
-          <Logo size={34} />
-        </div>
-
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">
-          <div className="rise glow-border rounded-3xl bg-surface/85 p-8 backdrop-blur-sm sm:p-10" style={{ animationDelay: "150ms" }}>
-            <span aria-hidden="true" className="relative mb-6 flex size-14 items-center justify-center rounded-2xl bg-primary/12 text-primary-text ring-1 ring-primary/25">
-              <ShieldCheck className="size-7" />
-            </span>
-            <h2 className="text-3xl font-semibold tracking-tight">Log in</h2>
-            <p className="mt-2 text-text-muted">Continue with Discord to manage DiscoNotify for the servers you run.</p>
-
-            {err && ERRORS[err] && (
-              <p role="alert" className="mt-6 rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm">
-                {ERRORS[err]}
-              </p>
-            )}
-
-            <a href={`/api/auth/login?next=${encodeURIComponent(next)}`} className={cn(linkButtonClass("discord", "lg"), "group mt-7 w-full")}>
-              Continue with Discord
-              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
-            </a>
-
-            <ul className="mt-8 space-y-3 text-sm text-text-muted">
-              {["Only servers you manage are shown", "We read your username, avatar and server list, nothing else", "Log out any time to end access"].map((t) => (
-                <li key={t} className="flex items-start gap-2.5">
-                  <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                  {t}
-                </li>
-              ))}
-            </ul>
+          <div className="rise mt-10 hidden lg:block [@media(min-height:860px)]:block" style={{ animationDelay: "360ms" }}>
+            <div className="hidden lg:block">
+              <LiveFeed />
+            </div>
           </div>
+        </section>
 
-          <PlatformMarquee className="rise mt-8 lg:hidden" />
-        </div>
+        {/* Frosted login card */}
+        <section className="rise w-full max-w-md justify-self-center lg:justify-self-end" style={{ animationDelay: "160ms" }}>
+          <div className="glow-border relative overflow-hidden rounded-[28px] border border-border bg-surface/55 p-7 shadow-popover backdrop-blur-2xl sm:p-9">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-br from-signal/12 via-transparent to-twitch/10" />
 
-        <p className="mx-auto max-w-sm text-center text-xs text-text-muted">
-          By continuing you agree to the{" "}
-          <a className="underline underline-offset-2 hover:text-text" href={`${site}/terms`} target="_blank" rel="noopener noreferrer">
-            Terms
-          </a>{" "}
-          and{" "}
-          <a className="underline underline-offset-2 hover:text-text" href={`${site}/privacy`} target="_blank" rel="noopener noreferrer">
-            Privacy Policy
-          </a>
-          .{" "}
-          <a className="underline underline-offset-2 hover:text-text" href={site}>
-            What is DiscoNotify?
-          </a>
-        </p>
-      </section>
+            <div className="relative">
+              <h2 className="text-3xl font-extrabold tracking-[-0.03em]">Log in</h2>
+              <p className="mt-1.5 text-text-muted">Continue with Discord to manage DiscoNotify for the servers you run.</p>
+
+              {err && ERRORS[err] && (
+                <p role="alert" className="mt-5 rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm">
+                  {ERRORS[err]}
+                </p>
+              )}
+
+              <a href={`/api/auth/login?next=${encodeURIComponent(next)}`} className={cn(linkButtonClass("discord", "lg"), "group mt-6 w-full")}>
+                Continue with Discord
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+              </a>
+
+              <div className="mt-7 flex items-center gap-3 text-xs text-text-subtle">
+                <span className="h-px flex-1 bg-border" />
+                Included
+                <span className="h-px flex-1 bg-border" />
+              </div>
+
+              <ul className="mt-4 grid grid-cols-3 gap-3">
+                {INCLUDED.map(({ icon: Icon, label }) => (
+                  <li key={label} className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface/50 px-2 py-3.5 text-center">
+                    <Icon className="size-5 text-primary-text" aria-hidden="true" />
+                    <span className="text-xs font-medium text-text-muted">{label}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-6 text-center text-sm text-text-muted">
+                New to DiscoNotify?{" "}
+                <a className="font-semibold text-text underline underline-offset-2" href={inviteUrl()} target="_blank" rel="noopener noreferrer">
+                  Add it to a server
+                </a>
+              </p>
+              <p className="mt-3 text-center text-xs text-text-subtle">
+                We read your username, avatar and server list, nothing else. By continuing you agree to the{" "}
+                <a className="underline underline-offset-2 hover:text-text" href={`${site}/terms`} target="_blank" rel="noopener noreferrer">
+                  Terms
+                </a>{" "}
+                and{" "}
+                <a className="underline underline-offset-2 hover:text-text" href={`${site}/privacy`} target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </a>
+                .
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
