@@ -1,9 +1,7 @@
-import { NextResponse, type NextRequest } from "next/server";
 import { assertSameOrigin, respond } from "@/lib/api";
-import { getEnv } from "@/lib/env";
 import { fetchManageableGuilds, refreshSessionTokens } from "@/lib/discord";
 import { invalidateGuilds, primeGuilds, rememberGuilds } from "@/lib/guild-cache";
-import { getSession, safeNext } from "@/lib/session";
+import { getSession } from "@/lib/session";
 
 async function reload(session: Awaited<ReturnType<typeof getSession>>): Promise<boolean> {
   if (!session.user || !session.at) return false;
@@ -15,33 +13,18 @@ async function reload(session: Awaited<ReturnType<typeof getSession>>): Promise<
 }
 
 /**
- * GET: used when the Discord token expired while rendering a page (cookies can't be written then).
- *      Refreshes the token, re-reads the list and sends the person back where they were.
- * POST: the "Refresh servers" button. Re-reads the list (at most once per 30 s) and returns JSON, no page reload.
+ * POST: refreshes the Discord token if needed and re-reads the server list (at most once per 30 s). Returns JSON, so the
+ * "Refresh" button and the in-app reconnect page never cause a full page load.
  */
-export async function GET(req: NextRequest) {
-  const appUrl = getEnv().APP_URL;
-  const next = safeNext(req.nextUrl.searchParams.get("next"));
-  const session = await getSession();
-  if (!session.user) return NextResponse.redirect(`${appUrl}/login?next=${encodeURIComponent(next)}`);
-  try {
-    if (!(await refreshSessionTokens(session, { force: true }))) throw new Error("token refresh failed");
-    invalidateGuilds(session.user.id, { force: true });
-    await reload(session);
-  } catch (e) {
-    console.error("[auth] refresh failed:", e instanceof Error ? e.message : e);
-    session.destroy();
-    return NextResponse.redirect(`${appUrl}/api/auth/login?next=${encodeURIComponent(next)}`);
-  }
-  return NextResponse.redirect(`${appUrl}${next}`);
-}
-
 export async function POST(req: Request) {
   return respond(async () => {
     assertSameOrigin(req);
     const session = await getSession();
     if (!session.user) return { refreshed: false };
-    await refreshSessionTokens(session);
+    if (!(await refreshSessionTokens(session))) {
+      session.destroy(); // the refresh token was revoked or expired: log in again
+      return { refreshed: false };
+    }
     const recent = session.gat && Date.now() - session.gat < 30_000;
     if (!recent) {
       invalidateGuilds(session.user.id, { force: true });

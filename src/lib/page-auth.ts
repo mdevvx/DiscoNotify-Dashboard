@@ -13,8 +13,9 @@ export async function requireSession(): Promise<{ user: NonNullable<SessionData[
   const path = (await headers()).get("x-pathname") ?? "/servers";
   if (!session.user) redirect(`/login?next=${encodeURIComponent(path)}`);
   const guilds = await getManageableGuilds(session);
-  // Token expired or revoked: a route handler refreshes it (cookies can't be written while rendering) and comes back.
-  if (!guilds) redirect(`/api/auth/refresh?next=${encodeURIComponent(path)}`);
+  // Token expired or revoked: a small in-app page refreshes it with a fetch (cookies can't be written while rendering)
+  // and navigates back client-side, so there is no full page load.
+  if (!guilds) redirect(`/session-refresh?next=${encodeURIComponent(path)}`);
   return { user: session.user, guilds };
 }
 

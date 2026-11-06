@@ -51,7 +51,11 @@ export function RefreshServers() {
   async function go() {
     setBusy(true);
     try {
-      await api("/api/auth/refresh", "POST");
+      const r = await api<{ refreshed: boolean }>("/api/auth/refresh", "POST");
+      if (!r.refreshed) {
+        router.replace("/login");
+        return;
+      }
       start(() => router.refresh());
     } catch {
       toast.error("Couldn’t refresh your servers. Please try again.");
