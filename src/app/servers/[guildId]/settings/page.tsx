@@ -1,6 +1,6 @@
 import { Settings } from "lucide-react";
 import type { Metadata } from "next";
-import { BotSwitch } from "@/components/bot-switch";
+import { BotStatus } from "@/components/bot-status";
 import { PermissionChecks } from "@/components/permission-checks";
 import { CopyButton } from "@/components/copy-button";
 import { RemoveAll } from "@/components/remove-all";
@@ -19,7 +19,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ guild
     <>
       <PageHeader title="Settings" icon={<Settings />} description="Server-wide options for DiscoNotify." />
       <div className="grid gap-4">
-        <BotSwitch guildId={guildId} initial={ctx.guildRow?.enabled ?? true} />
+        <BotStatus guildId={guildId} initial={ctx.guildRow?.enabled ?? true} />
 
         <Card className="p-5">
           <h2 className="mb-3 font-semibold">Server details</h2>

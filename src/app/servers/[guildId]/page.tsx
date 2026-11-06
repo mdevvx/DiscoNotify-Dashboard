@@ -2,7 +2,7 @@ import { linkButtonClass } from "@/lib/button-styles";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AlertTriangle, BellRing, CheckCircle2, Circle, Radio, ShieldAlert, Users, type LucideIcon } from "lucide-react";
-import { BotSwitch } from "@/components/bot-switch";
+import { BotStatus } from "@/components/bot-status";
 import { Badge, Card, EmptyState, GuildIcon, PlatformBadge } from "@/components/ui";
 import { RelativeTime } from "@/components/relative-time";
 import {
@@ -74,7 +74,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ guild
       </section>
 
       <div className="grid gap-4">
-        <BotSwitch guildId={guildId} initial={ctx.guildRow?.enabled ?? true} />
+        <BotStatus guildId={guildId} initial={ctx.guildRow?.enabled ?? true} />
 
         {accounts.length === 0 && (
           <Card className="p-5">
