@@ -32,6 +32,7 @@ export default async function AccountsPage({ params }: { params: Promise<{ guild
       alertsOn: mine.filter((c) => c.enabled).length,
       alertsTotal: mine.length,
       mention: roleIds.includes(guildId) ? "everyone" : roleIds.length ? "role" : "none",
+      alerts: mine.map((c) => ({ type: c.event_type, enabled: c.enabled, role: c.mention_role_id })),
       pausedByPlan: paused.has(a.id),
       live: live.has(a.id),
     };

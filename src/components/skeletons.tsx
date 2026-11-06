@@ -21,18 +21,24 @@ export function RowsSkeleton({ rows = 4, className }: { rows?: number; className
     <Card className={className} aria-hidden="true">
       <ul className="divide-y divide-border">
         {Array.from({ length: rows }, (_, i) => (
-          <li key={i} className="grid gap-3 p-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] md:items-center">
-            <div className="space-y-2">
+          <li key={i} className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)_auto] lg:items-center">
+            <div className="space-y-2.5">
+              <div className="flex gap-2">
+                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-6 w-16 rounded-full" />
+              </div>
               <Skeleton className="h-5 w-40" />
-              <Skeleton className="h-4 w-28" />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Skeleton className="h-11" />
-              <Skeleton className="h-11" />
+            <div className="grid gap-x-6 gap-y-3.5 sm:grid-cols-2">
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10" />
+              <Skeleton className="h-10 sm:col-span-2" />
+              <Skeleton className="h-10" />
             </div>
-            <div className="flex gap-2">
-              <Skeleton className="h-11 w-24" />
-              <Skeleton className="h-11 w-20" />
+            <div className="flex gap-2 md:col-span-2 lg:col-span-1">
+              <Skeleton className="h-9.5 w-24" />
+              <Skeleton className="h-9.5 w-20" />
+              <Skeleton className="h-9.5 w-20" />
             </div>
           </li>
         ))}

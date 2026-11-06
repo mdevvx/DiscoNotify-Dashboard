@@ -38,6 +38,7 @@ export default async function AccountPage({ params }: { params: Promise<{ guildI
     alertsOn: configs.filter((c) => c.enabled).length,
     alertsTotal: configs.length,
     mention: "none",
+    alerts: configs.map((c) => ({ type: c.event_type, enabled: c.enabled, role: c.mention_role_id })),
     pausedByPlan: paused.has(account.id),
     live: live.has(account.id),
   };

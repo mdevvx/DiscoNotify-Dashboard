@@ -4,7 +4,7 @@ import { linkButtonClass } from "@/lib/button-styles";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Lock, Send } from "lucide-react";
+import { BellRing, ChevronDown, Loader2, Lock, Send } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/client-api";
 import type { GuildInfo } from "@/lib/bot-jobs";
@@ -72,8 +72,6 @@ export function AccountSettings({
       return false;
     }
   }
-
-  const mentionable = data?.canMentionEveryone ?? false;
 
   return (
     <div className="grid gap-4">
@@ -144,27 +142,34 @@ export function AccountSettings({
         ) : (
           <ul className="divide-y divide-border">
             {configs.map((c) => (
-              <AlertRow key={c.event_type} cfg={c} platform={account.platform} data={data} mentionable={mentionable} guildId={guildId}
+              <AlertRow key={c.event_type} cfg={c} platform={account.platform} data={data} guildId={guildId}
                 onToggle={(patch) => patchAlerts(c.event_type, patch)} />
             ))}
           </ul>
         )}
       </Card>
 
-      {/* 4/5. All alert types: mention + message */}
+      {/* 4. All alert types at once */}
       {configs.length > 1 && (
-        <Card className="p-4">
-          <h2 className="font-semibold">Apply to all alert types</h2>
-          <p className="mb-3 text-sm text-text-muted">Set who gets pinged and the message for every alert type of this account at once.</p>
-          <MentionMessageEditor
+        <Card className="space-y-6 p-4">
+          <div>
+            <h2 className="font-semibold">Apply to all alert types</h2>
+            <p className="text-sm text-text-muted">Change who gets pinged, or the message, for every alert type of this account at once.</p>
+          </div>
+          <PingSelect
             idPrefix="all"
-            platform={account.platform}
             guildId={guildId}
             data={data}
-            initialRole={sameValue(configs.map((c) => c.mention_role_id))}
+            value={configs.every((c) => c.mention_role_id === configs[0]?.mention_role_id) ? (configs[0]?.mention_role_id ?? null) : "mixed"}
+            onChange={(role) => patchAlerts(null, { mention_role_id: role })}
+          />
+          <MessageEditor
+            idPrefix="all"
+            platform={account.platform}
+            data={data}
             initialMessage={sameValue(configs.map((c) => c.custom_message)) ?? ""}
             embed={configs.some((c) => c.embed_enabled)}
-            onSave={(role, message) => patchAlerts(null, { mention_role_id: role, custom_message: message })}
+            onSave={(message) => patchAlerts(null, { custom_message: message })}
           />
         </Card>
       )}
@@ -212,15 +217,15 @@ function ChannelPicker({ info, current, currentName, valid, busy, onSave }: { in
   );
 }
 
-function AlertRow({ cfg, platform, data, mentionable, guildId, onToggle }: {
-  cfg: AlertCfg; platform: string; data: InfoResponse | null; mentionable: boolean; guildId: string;
+function AlertRow({ cfg, platform, data, guildId, onToggle }: {
+  cfg: AlertCfg; platform: string; data: InfoResponse | null; guildId: string;
   onToggle: (patch: Partial<AlertCfg>) => Promise<boolean | undefined>;
 }) {
   const [open, setOpen] = useState(false);
   const label = EVENT_LABELS[cfg.event_type] ?? cfg.event_type;
   const id = `alert-${cfg.event_type}`;
   return (
-    <li className="p-4">
+    <li className="space-y-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="font-medium">{label}</p>
@@ -233,41 +238,100 @@ function AlertRow({ cfg, platform, data, mentionable, guildId, onToggle }: {
           <label className="flex items-center gap-2 text-sm" htmlFor={`${id}-embed`}>
             Show embed / link preview <Switch id={`${id}-embed`} checked={cfg.embed_enabled} onCheckedChange={(v) => onToggle({ embed_enabled: v })} />
           </label>
-          <button type="button" aria-expanded={open} aria-controls={`${id}-more`} onClick={() => setOpen((o) => !o)} className="inline-flex min-h-9 items-center gap-1 text-sm text-primary-text">
-            Customize message <ChevronDown className={cn("size-4 transition-transform duration-150", open && "rotate-180")} aria-hidden="true" />
-          </button>
         </div>
       </div>
+
+      {/* Who gets pinged is always visible and saves as soon as you choose. It does not need a custom message. */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0 flex-1 basis-72">
+          <PingSelect idPrefix={id} guildId={guildId} data={data} value={cfg.mention_role_id} onChange={(role) => onToggle({ mention_role_id: role })} />
+        </div>
+        <button type="button" aria-expanded={open} aria-controls={`${id}-more`} onClick={() => setOpen((o) => !o)} className="inline-flex h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-primary-text hover:bg-surface-raised">
+          {cfg.custom_message ? "Edit custom message" : "Customize message"}
+          <ChevronDown className={cn("size-4 transition-transform duration-150", open && "rotate-180")} aria-hidden="true" />
+        </button>
+      </div>
+
       {open && (
-        <div id={`${id}-more`} className="fade-in mt-4 border-t border-border pt-4">
-          <MentionMessageEditor
+        <div id={`${id}-more`} className="fade-in border-t border-border pt-4">
+          <MessageEditor
             idPrefix={id}
             platform={platform}
-            guildId={guildId}
             data={data}
-            initialRole={cfg.mention_role_id}
             initialMessage={cfg.custom_message ?? ""}
             embed={cfg.embed_enabled}
-            onSave={(role, message) => onToggle({ mention_role_id: role, custom_message: message })}
+            onSave={(message) => onToggle({ custom_message: message })}
           />
         </div>
       )}
-      <span hidden>{String(mentionable)}</span>
     </li>
   );
 }
 
-function MentionMessageEditor({ idPrefix, platform, guildId, data, initialRole, initialMessage, embed, onSave }: {
-  idPrefix: string; platform: string; guildId: string; data: InfoResponse | null;
-  initialRole: string | null; initialMessage: string; embed: boolean;
-  onSave: (role: string | null, message: string | null) => Promise<boolean | undefined>;
+/**
+ * "Who gets pinged": Nobody, @everyone or a role. Saves immediately on change (and rolls back with a message if it fails).
+ * `value` is a role id, null (nobody), or "mixed" when alert types differ (only used by the "all alert types" card).
+ */
+function PingSelect({ idPrefix, guildId, data, value, onChange }: {
+  idPrefix: string; guildId: string; data: InfoResponse | null; value: string | null | "mixed";
+  onChange: (role: string | null) => Promise<boolean | undefined>;
 }) {
-  const [role, setRole] = useState(initialRole ?? "");
+  const [saving, setSaving] = useState(false);
+  const can = data?.canMentionEveryone ?? false;
+  const lock = (mentionable: boolean) => !mentionable && !can;
+  const current = value === "mixed" ? "mixed" : (value ?? "");
+  const roleName = data?.info.roles.find((r) => r.id === value)?.name;
+
+  async function pick(next: string) {
+    if (next === "mixed" || next === current) return;
+    setSaving(true);
+    await onChange(next || null);
+    setSaving(false);
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={`${idPrefix}-role`} className="flex items-center gap-1.5 text-[0.92rem] font-semibold">
+        <BellRing className="size-4 text-text-muted" aria-hidden="true" /> Who gets pinged
+        {saving && <Loader2 className="size-3.5 animate-spin text-text-muted" aria-label="Saving" />}
+      </label>
+      <Select id={`${idPrefix}-role`} value={data ? current : ""} onChange={(e) => pick(e.target.value)} disabled={!data || saving}>
+        {!data && <option value="">Loading roles…</option>}
+        {data && value === "mixed" && <option value="mixed" disabled>Different for each alert type</option>}
+        {data && <option value="">Nobody</option>}
+        {data && <option value={data.info.everyone_role_id} disabled={!can}>@everyone{!can ? " 🔒" : ""}</option>}
+        {data?.info.roles.filter((r) => !r.managed).map((r) => (
+          <option key={r.id} value={r.id} disabled={lock(r.mentionable)}>@{r.name}{lock(r.mentionable) ? " 🔒" : ""}</option>
+        ))}
+      </Select>
+      <p className="text-[0.82rem] text-text-subtle">
+        {value === "mixed"
+          ? "Pick one to apply it to every alert type."
+          : value === guildId
+            ? "Everyone in the server is pinged."
+            : value
+              ? `${roleName ? `@${roleName}` : "That role"} is pinged with each alert.`
+              : "Nobody is pinged. Alerts are posted without a mention."}
+      </p>
+      {data && !can && (
+        <p className="flex items-center gap-1.5 text-[0.82rem] text-text-subtle">
+          <Lock className="size-3" aria-hidden="true" /> 🔒 options need the “Mention @everyone, @here and All Roles” permission.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** The custom message (text, placeholders, live preview). Saved with its own button; independent of the ping role. */
+function MessageEditor({ idPrefix, platform, data, initialMessage, embed, onSave }: {
+  idPrefix: string; platform: string; data: InfoResponse | null; initialMessage: string; embed: boolean;
+  onSave: (message: string | null) => Promise<boolean | undefined>;
+}) {
   const [msg, setMsg] = useState(initialMessage);
-  const [saved, setSaved] = useState({ role: initialRole ?? "", msg: initialMessage });
+  const [saved, setSaved] = useState(initialMessage);
   const [saving, setSaving] = useState(false);
   const ta = useRef<HTMLTextAreaElement>(null);
-  const dirty = role !== saved.role || msg !== saved.msg;
+  const dirty = msg !== saved;
   const can = data?.canMentionEveryone ?? false;
   const pingError = !can && HAS_EVERYONE_PING.test(msg) ? "Only people with the “Mention @everyone, @here and All Roles” permission can use @everyone or @here." : null;
 
@@ -292,31 +356,16 @@ function MentionMessageEditor({ idPrefix, platform, guildId, data, initialRole, 
 
   async function save() {
     setSaving(true);
-    const ok = await onSave(role || null, msg.trim() ? msg : null);
+    const ok = await onSave(msg.trim() ? msg : null);
     setSaving(false);
-    if (ok) setSaved({ role, msg });
+    if (ok) setSaved(msg);
   }
 
-  const lock = (m: boolean) => !m && !can;
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor={`${idPrefix}-role`} className="block text-sm font-medium">Who gets pinged</label>
-          <Select id={`${idPrefix}-role`} value={role} onChange={(e) => setRole(e.target.value)} disabled={!data}>
-            <option value="">Nobody</option>
-            {data && <option value={data.info.everyone_role_id} disabled={!can}>@everyone{!can ? " 🔒" : ""}</option>}
-            {data?.info.roles.filter((r) => !r.managed).map((r) => (
-              <option key={r.id} value={r.id} disabled={lock(r.mentionable)}>@{r.name}{lock(r.mentionable) ? " 🔒" : ""}</option>
-            ))}
-          </Select>
-          {data && !can && (
-            <p className="flex items-center gap-1.5 text-xs text-text-muted"><Lock className="size-3" aria-hidden="true" /> Locked options need the “Mention @everyone, @here and All Roles” permission.</p>
-          )}
-          {role === guildId && <span className="sr-only">Pinging everyone</span>}
-        </div>
-        <div className="space-y-1.5">
-          <label htmlFor={`${idPrefix}-msg`} className="block text-sm font-medium">Custom message</label>
+          <label htmlFor={`${idPrefix}-msg`} className="block text-[0.92rem] font-semibold">Custom message</label>
           <Textarea id={`${idPrefix}-msg`} ref={ta} value={msg} maxLength={1500} onChange={(e) => setMsg(e.target.value)} placeholder="Leave empty to use the default message" aria-describedby={`${idPrefix}-count`} />
           <div className="flex items-center justify-between text-xs text-text-muted">
             <span id={`${idPrefix}-count`} className="tabular-nums">{msg.length}/1500</span>
@@ -330,7 +379,7 @@ function MentionMessageEditor({ idPrefix, platform, guildId, data, initialRole, 
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="primary" loading={saving} disabled={!dirty || Boolean(pingError)} onClick={save}>Save</Button>
+          <Button variant="primary" loading={saving} disabled={!dirty || Boolean(pingError)} onClick={save}>Save message</Button>
           {dirty ? <span className="text-xs text-warning">Unsaved changes</span> : <span className="text-xs text-text-muted">All saved</span>}
         </div>
       </div>
